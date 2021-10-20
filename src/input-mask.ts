@@ -11,9 +11,14 @@ const REG_EXPS = {
   Numbers: /^[0-9]/i,
 };
 
-export function format(value: string, pattern: string): string {
-  const cleanedValue = value.replace(/[^a-z0-9]/gi, ''); // remove all special chars
-  const chars = cleanedValue.split('');
+export interface FormatResult {
+  raw: string;
+  value: string;
+}
+
+export function format(value: string, pattern: string): FormatResult {
+  const raw = value.replace(/[^a-z0-9]/gi, ''); // remove all special chars
+  const chars = raw.split('');
 
   let count = 0;
   let formatted = '';
@@ -47,14 +52,29 @@ export function format(value: string, pattern: string): string {
     }
   }
 
-  return formatted;
+  return { raw, value: formatted };
 }
 
-export class InputMask extends HTMLElement {
-  private mask = this.getAttribute('mask') || '';
+export class InputMaskElement extends HTMLElement {
+  set mask(val: string) {
+    this.setAttribute('mask', val);
+  }
+
+  get mask() {
+    return this.getAttribute('mask') || '';
+  }
+
   private removeInputMask: () => void = () => void 0;
 
   connectedCallback() {
+    // Format the default value
+    this.querySelectorAll('input').forEach((input) => {
+      const result = format(input.value, this.mask);
+
+      input.value = result.value;
+      input.setAttribute('value', result.raw);
+    });
+
     this.removeInputMask = applyInputMask(this, this.mask);
   }
 
@@ -67,15 +87,24 @@ export class InputMask extends HTMLElement {
   }
 }
 
+export class InputMaskChangeEvent extends Event {
+  constructor(public readonly value: FormatResult) {
+    super('inputmaskchange', { bubbles: true });
+  }
+}
+
 export function applyInputMask(container: HTMLElement, mask: string) {
   function onInput(e: Event) {
     const input = e.target as HTMLInputElement;
     const selectionStart = input.selectionStart || 0;
-    const prevValue = input.value;
+    const prev = input.value;
 
-    input.value = format(input.value, mask);
+    const result = format(input.value, mask);
 
-    const offset = input.value.length - prevValue.length;
+    input.value = result.value;
+    input.setAttribute('value', result.raw);
+
+    const offset = input.value.length - prev.length;
     const maskChar = mask[selectionStart - 1] as PatternChar | undefined;
 
     // check if the current value is not a space for characters and has an offset greater then 0
@@ -83,6 +112,11 @@ export function applyInputMask(container: HTMLElement, mask: string) {
       input.setSelectionRange(selectionStart + offset, selectionStart + offset);
     } else {
       input.setSelectionRange(selectionStart, selectionStart);
+    }
+
+    if (prev !== input.value) {
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new InputMaskChangeEvent(result));
     }
   }
 

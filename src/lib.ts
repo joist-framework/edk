@@ -1,1 +1,1 @@
-export { InputMask, format, applyInputMask } from './input-mask.js';
+export { InputMaskElement, format, applyInputMask } from './input-mask.js';
