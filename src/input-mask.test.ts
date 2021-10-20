@@ -1,8 +1,45 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { InputMaskElement, InputMaskChangeEvent } from './input-mask';
+import { InputMaskElement, InputMaskChangeEvent, format } from './input-mask';
 
 customElements.define('test-input-mask', InputMaskElement);
+
+describe('format', () => {
+  it('should retrn the correct raw value', () => {
+    expect(format('(123) 456 7890', '(***) ***-****')).to.deep.equal({
+      raw: '1234567890',
+      formatted: '(123) 456-7890',
+    });
+  });
+
+  it('should return a formatted phone number (***) ***-****', () => {
+    expect(format('1234567890', '(***) ***-****')).to.deep.equal({
+      raw: '1234567890',
+      formatted: '(123) 456-7890',
+    });
+  });
+
+  it('should return a formatted phone number ***-***-****', () => {
+    expect(format('1234567890', '***-***-****')).to.deep.equal({
+      raw: '1234567890',
+      formatted: '123-456-7890',
+    });
+  });
+
+  it('should only allow numbers', () => {
+    expect(format('304213abcd', '999-999-9999')).to.deep.equal({
+      raw: '304213abcd',
+      formatted: '304-213-',
+    });
+  });
+
+  it('should only allow a mix of letters and numbers', () => {
+    expect(format('C94749', 'A-99999')).to.deep.equal({
+      raw: 'C94749',
+      formatted: 'C-94749',
+    });
+  });
+});
 
 describe('InputMaskElement', () => {
   it('should format default value', async () => {
@@ -54,8 +91,7 @@ describe('InputMaskElement', () => {
       el.addEventListener('inputmaskchange', (e) => {
         const evt = e as InputMaskChangeEvent;
 
-        expect(evt.value.value).to.equal('(888) 888-8888');
-        expect(evt.value.raw).to.equal('8888888888');
+        expect(evt.value).to.equal('(888) 888-8888');
 
         resolve();
       });

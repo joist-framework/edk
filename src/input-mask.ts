@@ -11,12 +11,12 @@ const REG_EXPS = {
   Numbers: /^[0-9]/i,
 };
 
-export interface FormatResult {
+export interface FormattedResult {
   raw: string;
-  value: string;
+  formatted: string;
 }
 
-export function format(value: string, pattern: string): FormatResult {
+export function format(value: string, pattern: string): FormattedResult {
   const raw = value.replace(/[^a-z0-9]/gi, ''); // remove all special chars
   const chars = raw.split('');
 
@@ -52,7 +52,7 @@ export function format(value: string, pattern: string): FormatResult {
     }
   }
 
-  return { raw, value: formatted };
+  return { raw, formatted };
 }
 
 export class InputMaskElement extends HTMLElement {
@@ -71,7 +71,7 @@ export class InputMaskElement extends HTMLElement {
     this.querySelectorAll('input').forEach((input) => {
       const result = format(input.value, this.mask);
 
-      input.value = result.value;
+      input.value = result.formatted;
       input.setAttribute('value', result.raw);
     });
 
@@ -88,7 +88,7 @@ export class InputMaskElement extends HTMLElement {
 }
 
 export class InputMaskChangeEvent extends Event {
-  constructor(public readonly value: FormatResult) {
+  constructor(public readonly value: string) {
     super('inputmaskchange', { bubbles: true });
   }
 }
@@ -101,7 +101,7 @@ export function applyInputMask(container: HTMLElement, mask: string) {
 
     const result = format(input.value, mask);
 
-    input.value = result.value;
+    input.value = result.formatted;
     input.setAttribute('value', result.raw);
 
     const offset = input.value.length - prev.length;
@@ -116,7 +116,7 @@ export function applyInputMask(container: HTMLElement, mask: string) {
 
     if (prev !== input.value) {
       input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new InputMaskChangeEvent(result));
+      input.dispatchEvent(new InputMaskChangeEvent(input.value));
     }
   }
 
