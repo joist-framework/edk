@@ -11,7 +11,7 @@ const REG_EXPS = {
   Numbers: /^[0-9]/i,
 };
 
-export function format(value: string, pattern: string) {
+export function format(value: string, pattern: string): string {
   const cleanedValue = value.replace(/[^a-z0-9]/gi, ''); // remove all special chars
   const chars = cleanedValue.split('');
 
@@ -51,42 +51,47 @@ export function format(value: string, pattern: string) {
 }
 
 export class InputMask extends HTMLElement {
-  value: string = '';
-
   private mask = this.getAttribute('mask') || '';
 
   connectedCallback() {
+    this.addInputListener();
+    this.addKeyDownListener();
+  }
+
+  attributeChangedCallback() {
+    this.mask = this.getAttribute('mask') || '';
+  }
+
+  private addInputListener() {
     this.addEventListener('input', (e) => {
       const input = e.target as HTMLInputElement;
-      const selectionStart = input.selectionStart;
+      const selectionStart = input.selectionStart || 0;
+      const prevValue = input.value;
 
-      this.value = input.value;
       input.value = format(input.value, this.mask);
 
-      const offset = input.value.length - this.value.length;
+      const offset = input.value.length - prevValue.length;
+      const maskChar = this.mask[selectionStart - 1] as PatternChar | undefined;
 
-      if (selectionStart !== null) {
-        if (PATTERN_CHARS.includes(this.mask[selectionStart - 1] as PatternChar) && offset >= 0) {
-          input.setSelectionRange(selectionStart + offset, selectionStart + offset);
-        } else {
-          input.setSelectionRange(input.selectionStart, input.selectionStart);
-        }
+      // check if the current value is not a space for characters and has an offset greater then 0
+      if (maskChar && !PATTERN_CHARS.includes(maskChar) && offset > 0) {
+        input.setSelectionRange(selectionStart + offset, selectionStart + offset);
+      } else {
+        input.setSelectionRange(selectionStart, selectionStart);
       }
     });
+  }
 
+  private addKeyDownListener() {
     this.addEventListener('keydown', (e) => {
       const input = e.target as HTMLInputElement;
-      const offset = input.value.length - this.value.length;
+      const patternChar = this.mask[input.selectionStart || 0];
 
-      let patternChar: string | undefined;
-
-      if (input.selectionStart !== null) {
-        patternChar = this.mask[input.selectionStart + offset];
-      }
-
-      if (e.key.length === 1 && /^[a-z0-9]/i.test(e.key) && patternChar) {
+      if (e.key.length === 1 && /^[a-z0-9]/i.test(e.key)) {
         // check that the key is a single character and that it is a letter or number
+
         if (input.value.length >= this.mask.length) {
+          console.log('preventing!');
           // prevent default once value is the same as the mask length
           e.preventDefault();
         } else if (patternChar === PatternChar.Number) {
