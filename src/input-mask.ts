@@ -52,60 +52,69 @@ export function format(value: string, pattern: string): string {
 
 export class InputMask extends HTMLElement {
   private mask = this.getAttribute('mask') || '';
+  private removeInputMask: () => void = () => void 0;
 
   connectedCallback() {
-    this.addInputListener();
-    this.addKeyDownListener();
+    this.removeInputMask = applyInputMask(this, this.mask);
   }
 
   attributeChangedCallback() {
+    this.removeInputMask();
+
     this.mask = this.getAttribute('mask') || '';
+
+    this.removeInputMask = applyInputMask(this, this.mask);
+  }
+}
+
+export function applyInputMask(container: HTMLElement, mask: string) {
+  function onInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const selectionStart = input.selectionStart || 0;
+    const prevValue = input.value;
+
+    input.value = format(input.value, mask);
+
+    const offset = input.value.length - prevValue.length;
+    const maskChar = mask[selectionStart - 1] as PatternChar | undefined;
+
+    // check if the current value is not a space for characters and has an offset greater then 0
+    if (maskChar && !PATTERN_CHARS.includes(maskChar) && offset > 0) {
+      input.setSelectionRange(selectionStart + offset, selectionStart + offset);
+    } else {
+      input.setSelectionRange(selectionStart, selectionStart);
+    }
   }
 
-  private addInputListener() {
-    this.addEventListener('input', (e) => {
-      const input = e.target as HTMLInputElement;
-      const selectionStart = input.selectionStart || 0;
-      const prevValue = input.value;
+  function onKeyDown(e: KeyboardEvent) {
+    const input = e.target as HTMLInputElement;
+    const patternChar = mask[input.selectionStart || 0];
 
-      input.value = format(input.value, this.mask);
+    if (e.key.length === 1 && /^[a-z0-9]/i.test(e.key)) {
+      // check that the key is a single character and that it is a letter or number
 
-      const offset = input.value.length - prevValue.length;
-      const maskChar = this.mask[selectionStart - 1] as PatternChar | undefined;
-
-      // check if the current value is not a space for characters and has an offset greater then 0
-      if (maskChar && !PATTERN_CHARS.includes(maskChar) && offset > 0) {
-        input.setSelectionRange(selectionStart + offset, selectionStart + offset);
-      } else {
-        input.setSelectionRange(selectionStart, selectionStart);
-      }
-    });
-  }
-
-  private addKeyDownListener() {
-    this.addEventListener('keydown', (e) => {
-      const input = e.target as HTMLInputElement;
-      const patternChar = this.mask[input.selectionStart || 0];
-
-      if (e.key.length === 1 && /^[a-z0-9]/i.test(e.key)) {
-        // check that the key is a single character and that it is a letter or number
-
-        if (input.value.length >= this.mask.length) {
-          console.log('preventing!');
-          // prevent default once value is the same as the mask length
+      if (input.value.length >= mask.length) {
+        // prevent default once value is the same as the mask length
+        e.preventDefault();
+      } else if (patternChar === PatternChar.Number) {
+        if (!REG_EXPS.Numbers.test(e.key)) {
+          // if pattern char specifies number and is not
           e.preventDefault();
-        } else if (patternChar === PatternChar.Number) {
-          if (!REG_EXPS.Numbers.test(e.key)) {
-            // if pattern char specifies number and is not
-            e.preventDefault();
-          }
-        } else if (patternChar === PatternChar.Letter) {
-          if (!REG_EXPS.Letters.test(e.key)) {
-            // if pattern char specifies letter and is not
-            e.preventDefault();
-          }
+        }
+      } else if (patternChar === PatternChar.Letter) {
+        if (!REG_EXPS.Letters.test(e.key)) {
+          // if pattern char specifies letter and is not
+          e.preventDefault();
         }
       }
-    });
+    }
   }
+
+  container.addEventListener('input', onInput);
+  container.addEventListener('keydown', onKeyDown);
+
+  return () => {
+    container.removeEventListener('input', onInput);
+    container.removeEventListener('keydown', onKeyDown);
+  };
 }
