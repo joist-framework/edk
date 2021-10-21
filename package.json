@@ -3,22 +3,17 @@
   "version": "0.0.1",
   "sideEffects": false,
   "description": "",
-  "types": "./lib.d.ts",
-  "main": "./lib.js",
-  "module": "./lib.js",
   "files": [
-    "target",
-    "styles",
-    "components",
-    "icons",
-    "utils"
+    "elements",
+    "utils",
+    "*.js"
   ],
   "scripts": {
     "prepare": "husky install",
     "build": "tsc",
     "test": "run-s test:*",
     "test:build": "tsc",
-    "test:wtr": "wtr *.test.js --node-resolve",
+    "test:wtr": "wtr **/*.test.js --node-resolve",
     "storybook": "start-storybook -p 6006",
     "storybook:build": "build-storybook"
   },

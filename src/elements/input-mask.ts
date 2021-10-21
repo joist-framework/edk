@@ -55,6 +55,11 @@ export function format(value: string, pattern: string): FormattedResult {
   return { raw, formatted };
 }
 
+function applyFormatting(input: HTMLInputElement, result: FormattedResult) {
+  input.value = result.formatted;
+  input.setAttribute('value', result.raw);
+}
+
 export class InputMaskElement extends HTMLElement {
   set mask(val: string) {
     this.setAttribute('mask', val);
@@ -68,11 +73,8 @@ export class InputMaskElement extends HTMLElement {
 
   connectedCallback() {
     // Format the default value
-    this.querySelectorAll('input').forEach((input) => {
-      const result = format(input.value, this.mask);
-
-      input.value = result.formatted;
-      input.setAttribute('value', result.raw);
+    this.querySelectorAll<HTMLInputElement>('input,[input-mask]').forEach((input) => {
+      applyFormatting(input, format(input.value, this.mask));
     });
 
     this.removeInputMask = applyInputMask(this, this.mask);
@@ -94,15 +96,15 @@ export class InputMaskChangeEvent extends Event {
 }
 
 export function applyInputMask(container: HTMLElement, mask: string) {
+  container.addEventListener('input', onInput);
+  container.addEventListener('keydown', onKeyDown);
+
   function onInput(e: Event) {
     const input = e.target as HTMLInputElement;
     const selectionStart = input.selectionStart || 0;
     const prev = input.value;
 
-    const result = format(input.value, mask);
-
-    input.value = result.formatted;
-    input.setAttribute('value', result.raw);
+    applyFormatting(input, format(input.value, mask));
 
     const offset = input.value.length - prev.length;
     const maskChar = mask[selectionStart - 1] as PatternChar | undefined;
@@ -143,9 +145,6 @@ export function applyInputMask(container: HTMLElement, mask: string) {
       }
     }
   }
-
-  container.addEventListener('input', onInput);
-  container.addEventListener('keydown', onKeyDown);
 
   return () => {
     container.removeEventListener('input', onInput);
