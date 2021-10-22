@@ -1,6 +1,7 @@
 /node_modules
 /utils
 /elements
+
 *.d.ts
 *.js
 *.js.map
