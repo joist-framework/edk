@@ -1,9 +1,9 @@
 import { animate } from '../utils/animate';
 
 export class ModalController<R = any, T extends HTMLElement = HTMLElement> {
-  modal: HTMLElement;
-
   private resolve: (value?: R) => void = () => void 0;
+
+  modal: HTMLElement;
 
   result = new Promise<R | undefined>((resolve) => {
     this.resolve = resolve;
@@ -14,14 +14,18 @@ export class ModalController<R = any, T extends HTMLElement = HTMLElement> {
 
     this.modalRoot.appendChild(this.modal);
 
-    animate(this.modal, 'modal-enter');
+    animate(this.modal, 'modal-enter').then(() => {
+      this.modal.dispatchEvent(new Event('modalafterenter'));
+    });
   }
 
   close(value?: R) {
     this.resolve(value);
 
-    animate(this.modal, 'modal-exit').then(() => {
-      this.modalRoot.removeChild(this.modal);
+    return animate(this.modal, 'modal-exit').then(() => {
+      if (this.modalRoot.contains(this.modal)) {
+        this.modalRoot.removeChild(this.modal);
+      }
     });
   }
 }

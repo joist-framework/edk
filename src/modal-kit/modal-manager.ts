@@ -13,7 +13,7 @@ export class ModalManager {
     this.addKeyUpListener();
   }
 
-  open<R, T extends HTMLElement>(Modal: new (...args: any[]) => T) {
+  open<R = any, T extends HTMLElement = HTMLElement>(Modal: new (...args: any[]) => T) {
     const controller = new ModalController<R, T>(Modal, this.root);
 
     this.activeModals.add(controller);

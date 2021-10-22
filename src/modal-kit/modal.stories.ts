@@ -41,7 +41,7 @@ export const Default = () => {
   const modal = new ModalManager(document.body);
 
   async function openModal() {
-    const controller = modal.open<FormData>(MyModal);
+    const controller = modal.open<FormData, MyModal>(MyModal);
 
     const res = await controller.result;
 
