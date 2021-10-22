@@ -17,9 +17,11 @@ class MyModal extends HTMLElement {
     render(
       html`
         <form @submit=${this.onClose.bind(this)}>
-          <input name="fname" />
+          <input name="fname" placeholder="First name" />
 
-          <button>Close</button>
+          <input name="lname" placeholder="Last name" />
+
+          <button>Submit</button>
         </form>
       `,
       this
@@ -29,9 +31,7 @@ class MyModal extends HTMLElement {
   private onClose(e: Event) {
     e.preventDefault();
 
-    const form = new FormData(e.target as HTMLFormElement);
-
-    this.controller.close(form.get('fname'));
+    this.controller.close(new FormData(e.target as HTMLFormElement));
   }
 }
 
@@ -41,7 +41,7 @@ export const Default = () => {
   const modal = new ModalManager(document.body);
 
   async function openModal() {
-    const controller = modal.open(MyModal);
+    const controller = modal.open<FormData>(MyModal);
 
     const res = await controller.result;
 
@@ -51,8 +51,9 @@ export const Default = () => {
   return html`
     <style>
       test-modal {
+        border-radius: 8px;
         background: #fff;
-        box-shadow: 0px 0px 10px #000;
+        box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.1);
         display: block;
         position: fixed;
         padding: 40px;
@@ -62,6 +63,13 @@ export const Default = () => {
         transform: translate(-50%);
         max-height: 80vh;
         z-index: 1001;
+      }
+
+      input {
+        padding: 0.5rem 1rem;
+        display: block;
+        font-size: 1rem;
+        margin-bottom: 1rem;
       }
 
       .modal-overlay {

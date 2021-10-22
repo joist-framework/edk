@@ -5,10 +5,9 @@ import { animate } from './animate';
 describe('utils: animate', () => {
   it('should resolve when the animation is complete', async () => {
     const el = document.createElement('div');
+    el.style.animationName = 'test-name';
 
     const animation = animate(el, 'animation-class');
-
-    expect(el.classList.contains('animation-class')).to.equal(true);
 
     el.dispatchEvent(new AnimationEvent('animationend'));
 

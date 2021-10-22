@@ -4,7 +4,7 @@ export function animate(el: HTMLElement, cssClass: string) {
 
     const styles = getComputedStyle(el);
 
-    if (styles.animationName === 'none' || !styles.animationName) {
+    if (styles.animationName === 'none' || (!styles.animationName && !el.style.animationName)) {
       return resolve(el);
     }
 

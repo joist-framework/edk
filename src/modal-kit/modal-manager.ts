@@ -13,11 +13,10 @@ export class ModalManager {
     this.addKeyUpListener();
   }
 
-  open<T extends HTMLElement>(Modal: new (...args: any[]) => T) {
-    const controller = new ModalController(Modal, this.root);
+  open<R, T extends HTMLElement>(Modal: new (...args: any[]) => T) {
+    const controller = new ModalController<R, T>(Modal, this.root);
 
     this.activeModals.add(controller);
-    this.root.appendChild(controller.modal);
 
     this.previouslyActive = document.activeElement as HTMLElement;
 
@@ -58,7 +57,7 @@ export class ModalManager {
         const modal = this.activeModals.values().next();
 
         if (!modal.done) {
-          modal.value.close('');
+          modal.value.close();
         }
       }
     };
@@ -76,6 +75,10 @@ export class ModalManager {
 
           this.overlay = null;
         });
+      }
+
+      if (this.focusManager) {
+        this.focusManager = null;
       }
 
       if (this.previouslyActive) {
