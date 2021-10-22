@@ -1,7 +1,7 @@
 /node_modules
 /utils
 /elements
-
+/modal-kit
 *.d.ts
 *.js
 *.js.map
