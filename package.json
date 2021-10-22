@@ -27,7 +27,7 @@
     "@storybook/addon-essentials": "6.3.12",
     "@storybook/addon-links": "6.3.12",
     "@storybook/web-components": "6.3.12",
-    "@types/mocha": "^8.2.3",
+    "@types/mocha": "9.0.0",
     "@web/test-runner": "0.13.20",
     "husky": "7.0.4",
     "lit-html": "2.0.1",
