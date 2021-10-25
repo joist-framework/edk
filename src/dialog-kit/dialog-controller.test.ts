@@ -1,12 +1,13 @@
 import { expect } from '@open-wc/testing';
-import { ModalController } from './modal-controller';
 
-customElements.define('modal-controller-test', ModalController);
+import { DialogController } from './dialog-controller';
 
-describe('ModalController', () => {
+customElements.define('modal-controller-test', DialogController);
+
+describe('DialogController', () => {
   it('should insert a modal into the defined container', () => {
     const container = document.createElement('div');
-    const controller = new ModalController();
+    const controller = new DialogController();
 
     controller.open(container);
 
@@ -15,7 +16,7 @@ describe('ModalController', () => {
 
   it('should remove a modal from the defined container', async () => {
     const container = document.createElement('div');
-    const controller = new ModalController();
+    const controller = new DialogController();
 
     controller.open(container);
 
@@ -26,7 +27,7 @@ describe('ModalController', () => {
 
   it('should resolve the result to the value passed when closing', async () => {
     const container = document.createElement('div');
-    const controller = new ModalController<string>();
+    const controller = new DialogController<string>();
 
     controller.open(container);
 

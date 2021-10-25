@@ -6,7 +6,7 @@
   "files": [
     "elements",
     "utils",
-    "modal-kit",
+    "dialog-kit",
     "*.js"
   ],
   "scripts": {

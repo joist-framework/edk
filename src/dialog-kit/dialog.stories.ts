@@ -1,14 +1,14 @@
 import { Meta } from '@storybook/web-components';
 import { html, render, TemplateResult } from 'lit-html';
 
-import { ModalController } from './modal-controller';
-import { ModalManager } from './modal-manager';
+import { DialogController } from './dialog-controller';
+import { DialogManager } from './dialog-manager';
 
 export default {
-  title: 'modal',
+  title: 'dialog',
 } as Meta;
 
-class MyModal extends ModalController<FormData> {
+class MyModal extends DialogController<FormData> {
   fname: string = '';
   lname: string = '';
 
@@ -42,7 +42,7 @@ class MyModal extends ModalController<FormData> {
 customElements.define('test-modal', MyModal);
 
 export const Default = () => {
-  const modal = new ModalManager(document.body);
+  const modal = new DialogManager(document.body, { showOverlay: true });
 
   async function openModal() {
     const controller = await modal.open(MyModal, { fname: 'Danny' });
