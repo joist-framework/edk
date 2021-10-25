@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/web-components';
-import { html, render } from 'lit-html';
+import { html, render, TemplateResult } from 'lit-html';
 
 import { ModalController } from './modal-controller';
 import { ModalManager } from './modal-manager';
@@ -8,30 +8,34 @@ export default {
   title: 'modal',
 } as Meta;
 
-class MyModal extends HTMLElement {
-  constructor(private controller: ModalController) {
-    super();
-  }
+class MyModal extends ModalController<FormData> {
+  fname: string = '';
+  lname: string = '';
 
   connectedCallback() {
-    render(
-      html`
-        <form @submit=${this.onClose.bind(this)}>
-          <input name="fname" placeholder="First name" />
-
-          <input name="lname" placeholder="Last name" />
-
-          <button>Submit</button>
-        </form>
-      `,
-      this
-    );
+    this.renderer(this.render());
   }
 
   private onClose(e: Event) {
     e.preventDefault();
 
-    this.controller.close(new FormData(e.target as HTMLFormElement));
+    this.close(new FormData(e.target as HTMLFormElement));
+  }
+
+  private renderer(res: TemplateResult) {
+    return render(res, this);
+  }
+
+  private render() {
+    return html`
+      <form @submit=${this.onClose.bind(this)}>
+        <input name="fname" placeholder="First name" .value=${this.fname} />
+
+        <input name="lname" placeholder="Last name" />
+
+        <button>Submit</button>
+      </form>
+    `;
   }
 }
 
@@ -41,8 +45,7 @@ export const Default = () => {
   const modal = new ModalManager(document.body);
 
   async function openModal() {
-    const controller = modal.open<FormData, MyModal>(MyModal);
-
+    const controller = await modal.open(MyModal, { fname: 'Danny' });
     const res = await controller.result;
 
     console.log('####', res);

@@ -1,36 +1,34 @@
 import { expect } from '@open-wc/testing';
 import { ModalController } from './modal-controller';
 
-class TestModal extends HTMLElement {}
-customElements.define('modal-controller-test', TestModal);
+customElements.define('modal-controller-test', ModalController);
 
 describe('ModalController', () => {
-  it('should create a controller and a modal element', () => {
-    const container = document.createElement('div');
-    const controller = new ModalController(TestModal, container);
-
-    expect(controller.modal.tagName.toLowerCase()).to.equal('modal-controller-test');
-  });
-
   it('should insert a modal into the defined container', () => {
     const container = document.createElement('div');
-    const controller = new ModalController(TestModal, container);
+    const controller = new ModalController();
 
-    expect(container.contains(controller.modal)).to.equal(true);
+    controller.open(container);
+
+    expect(container.contains(controller)).to.equal(true);
   });
 
   it('should remove a modal from the defined container', async () => {
     const container = document.createElement('div');
-    const controller = new ModalController(TestModal, container);
+    const controller = new ModalController();
+
+    controller.open(container);
 
     await controller.close();
 
-    expect(container.contains(controller.modal)).to.equal(false);
+    expect(container.contains(controller)).to.equal(false);
   });
 
   it('should resolve the result to the value passed when closing', async () => {
     const container = document.createElement('div');
-    const controller = new ModalController(TestModal, container);
+    const controller = new ModalController<string>();
+
+    controller.open(container);
 
     controller.close('Hello World');
 

@@ -4,8 +4,9 @@ import { FocusManager } from '../utils/focus-manager';
 import { animate } from '../utils/animate';
 
 export class ModalManager {
+  public controllers = new Set<ModalController>();
+
   private overlay: HTMLElement | null = null;
-  private activeModals = new Set<ModalController>();
   private previouslyActive: HTMLElement | null = null;
   private focusManager: FocusManager | null = null;
 
@@ -13,26 +14,18 @@ export class ModalManager {
     this.addKeyUpListener();
   }
 
-  open<R = any, T extends HTMLElement = HTMLElement>(Modal: new (...args: any[]) => T) {
-    const controller = new ModalController<R, T>(Modal, this.root);
+  open<T extends ModalController>(Modal: new (...args: any[]) => T, props: Partial<T> = {}): T {
+    const controller = new Modal();
 
-    this.activeModals.add(controller);
+    for (let prop in props) {
+      controller[prop] = props[prop] as T[Extract<keyof T, string>];
+    }
+
+    controller.open(this.root);
+
+    this.controllers.add(controller);
 
     this.previouslyActive = document.activeElement as HTMLElement;
-
-    // stop any previous focus manager
-    if (this.focusManager) {
-      this.focusManager.stop();
-    }
-
-    // Start up new forcus manager for modal
-    this.focusManager = new FocusManager(controller.modal);
-    this.focusManager.start();
-
-    // focus of first focusable element
-    if (this.focusManager.firstFocusableEl) {
-      this.focusManager.firstFocusableEl.focus();
-    }
 
     // Handle adding a single overlay
     if (!this.overlay) {
@@ -42,6 +35,20 @@ export class ModalManager {
       this.root.prepend(this.overlay);
 
       animate(this.overlay, 'modal-overlay-enter');
+    }
+
+    // stop any previous focus manager
+    if (this.focusManager) {
+      this.focusManager.stop();
+    }
+
+    // Start up new forcus manager for modal
+    this.focusManager = new FocusManager(controller);
+    this.focusManager.start();
+
+    // focus of first focusable element
+    if (this.focusManager.firstFocusableEl) {
+      this.focusManager.firstFocusableEl.focus();
     }
 
     controller.result.then(() => {
@@ -54,7 +61,7 @@ export class ModalManager {
   private addKeyUpListener() {
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.key.toUpperCase() === 'ESCAPE') {
-        const modal = this.activeModals.values().next();
+        const modal = this.controllers.values().next();
 
         if (!modal.done) {
           modal.value.close();
@@ -66,9 +73,9 @@ export class ModalManager {
   }
 
   private onClose(controller: ModalController) {
-    this.activeModals.delete(controller);
+    this.controllers.delete(controller);
 
-    if (this.activeModals.size === 0) {
+    if (this.controllers.size === 0) {
       if (this.overlay) {
         animate(this.overlay, 'modal-overlay-exit').then(() => {
           this.root.removeChild(this.overlay!);

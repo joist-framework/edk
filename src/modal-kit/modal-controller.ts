@@ -1,31 +1,32 @@
 import { animate } from '../utils/animate';
 
-export class ModalController<R = any, T extends HTMLElement = HTMLElement> {
+export class ModalController<R = any> extends HTMLElement {
   private resolve: (value?: R) => void = () => void 0;
-
-  modal: HTMLElement;
+  private modalRoot?: HTMLElement;
 
   result = new Promise<R | undefined>((resolve) => {
     this.resolve = resolve;
   });
 
-  constructor(Modal: new (...args: any[]) => T, public modalRoot: HTMLElement) {
-    this.modal = new Modal(this);
+  open(root: HTMLElement): void {
+    this.modalRoot = root;
 
-    this.modalRoot.appendChild(this.modal);
+    if (!this.modalRoot.contains(this)) {
+      this.modalRoot.appendChild(this);
 
-    animate(this.modal, 'modal-enter').then(() => {
-      this.modal.dispatchEvent(new Event('modalafterenter'));
-    });
+      animate(this, 'modal-enter');
+    }
   }
 
-  close(value?: R) {
+  async close(value?: R) {
     this.resolve(value);
 
-    return animate(this.modal, 'modal-exit').then(() => {
-      if (this.modalRoot.contains(this.modal)) {
-        this.modalRoot.removeChild(this.modal);
+    return animate(this, 'modal-exit').then(() => {
+      if (this.modalRoot && this.modalRoot.contains(this)) {
+        this.modalRoot.removeChild(this);
       }
+
+      return this;
     });
   }
 }
