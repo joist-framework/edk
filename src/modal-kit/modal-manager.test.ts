@@ -14,6 +14,7 @@ describe('ModalController', () => {
     const container = document.createElement('div');
     const manager = new ModalManager(container);
     const controller = manager.open(ModalManagerTest);
+
     expect(container.contains(controller)).to.equal(true);
   });
 
@@ -21,6 +22,7 @@ describe('ModalController', () => {
     const container = document.createElement('div');
     const manager = new ModalManager(container);
     const controller = manager.open(ModalManagerTest, { foo: 'Hello', bar: 'World' });
+
     expect(controller.foo).to.equal('Hello');
     expect(controller.bar).to.equal('World');
   });
@@ -28,9 +30,12 @@ describe('ModalController', () => {
   it('should apply a single overlay for n modals', () => {
     const container = document.createElement('div');
     const manager = new ModalManager(container);
+
     manager.open(ModalManagerTest, { foo: 'Hello', bar: 'World' });
     manager.open(ModalManagerTest, { foo: 'Hello', bar: 'World' });
+
     const overlay = container.querySelectorAll('.modal-overlay');
+
     expect(overlay.length).to.equal(1);
   });
 
