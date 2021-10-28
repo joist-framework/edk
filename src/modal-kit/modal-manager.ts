@@ -14,8 +14,20 @@ export class ModalManager {
   private previouslyActive: HTMLElement | null = null;
   private focusManager: FocusManager | null = null;
 
+  private onKeyUp = (e: KeyboardEvent) => {
+    if (e.key.toUpperCase() === 'ESCAPE') {
+      const modal = this.controllers.values().next();
+
+      if (!modal.done) {
+        if (modal.value.closeOnEsc) {
+          modal.value.close();
+        }
+      }
+    }
+  };
+
   constructor(private root: HTMLElement, private opts: ModalManagerOptions = {}) {
-    this.addKeyUpListener();
+    document.addEventListener('keyup', this.onKeyUp);
   }
 
   open<T extends ModalController>(Modal: new (...args: any[]) => T, props: Partial<T> = {}): T {
@@ -62,20 +74,8 @@ export class ModalManager {
     return controller;
   }
 
-  private addKeyUpListener() {
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.key.toUpperCase() === 'ESCAPE') {
-        const modal = this.controllers.values().next();
-
-        if (!modal.done) {
-          if (modal.value.closeOnEsc) {
-            modal.value.close();
-          }
-        }
-      }
-    };
-
-    document.addEventListener('keyup', onKeyUp);
+  clean() {
+    document.removeEventListener('keyup', this.onKeyUp);
   }
 
   private onClose(controller: ModalController) {

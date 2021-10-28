@@ -3,6 +3,29 @@ import { html, fixture, expect } from '@open-wc/testing';
 import { FocusManager, getFocusableEls } from './focus-manager.js';
 
 describe('utils: focus-trap', () => {
+  it('should return a list of focusable elements sorted by tabindex', async () => {
+    const container = await fixture<HTMLFormElement>(html`
+      <form>
+        <input name="fname" label="First name" tabindex="0" />
+        <input name="lname" label="Last name" tabindex="1" />
+        <input name="addr1" label="Address" tabindex="3" />
+        <input name="addr2" label="Address 2" tabindex="2" />
+
+        <button name="cancel-btn">Cancel</button>
+      </form>
+    `);
+
+    const els = getFocusableEls(container);
+
+    expect(els.map((el) => el.getAttribute('name'))).to.deep.equal([
+      'fname',
+      'cancel-btn',
+      'lname',
+      'addr2',
+      'addr1',
+    ]);
+  });
+
   it('should exclude elements marked to skip', async () => {
     const container = await fixture<HTMLFormElement>(html`
       <form>

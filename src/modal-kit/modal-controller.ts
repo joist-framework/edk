@@ -1,12 +1,13 @@
 import { animate } from '../utils/animate.js';
 
+export class ModalEvent extends Event {}
+
 export class ModalController<R = any> extends HTMLElement {
   private resolve: (value?: R) => void = () => void 0;
   private modalRoot?: HTMLElement;
 
-  closeOnEsc: boolean = true;
-
-  result = new Promise<R | undefined>((resolve) => {
+  public closeOnEsc: boolean = false;
+  public result = new Promise<R | undefined>((resolve) => {
     this.resolve = resolve;
   });
 
@@ -16,7 +17,11 @@ export class ModalController<R = any> extends HTMLElement {
     if (!this.modalRoot.contains(this)) {
       this.modalRoot.appendChild(this);
 
-      animate(this, 'modal-enter');
+      animate(this, 'modal-enter').then(() => {
+        this.dispatchEvent(new ModalEvent('modalafteropened'));
+      });
+
+      this.dispatchEvent(new ModalEvent('modalopened'));
     }
   }
 
@@ -27,6 +32,8 @@ export class ModalController<R = any> extends HTMLElement {
       if (this.modalRoot && this.modalRoot.contains(this)) {
         this.modalRoot.removeChild(this);
       }
+
+      this.dispatchEvent(new ModalEvent('modalclosed'));
 
       return this;
     });
