@@ -4,6 +4,8 @@ export class ModalController<R = any> extends HTMLElement {
   private resolve: (value?: R) => void = () => void 0;
   private modalRoot?: HTMLElement;
 
+  closeOnEsc: boolean = true;
+
   result = new Promise<R | undefined>((resolve) => {
     this.resolve = resolve;
   });

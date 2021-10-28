@@ -68,7 +68,9 @@ export class ModalManager {
         const modal = this.controllers.values().next();
 
         if (!modal.done) {
-          modal.value.close();
+          if (modal.value.closeOnEsc) {
+            modal.value.close();
+          }
         }
       }
     };

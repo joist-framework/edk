@@ -45,7 +45,7 @@ export const Dialog = () => {
   const modal = new ModalManager(document.body, { showOverlay: true });
 
   async function openModal() {
-    const controller = await modal.open(MyDialog, { fname: 'Danny' });
+    const controller = await modal.open(MyDialog, { fname: 'Danny', closeOnEsc: true });
     const res = await controller.result;
 
     console.log('####', res);
@@ -139,7 +139,7 @@ export const Toast = () => {
   const modal = new ModalManager(document.body, { showOverlay: false });
 
   async function openModal() {
-    const controller = await modal.open(ToastElement);
+    const controller = await modal.open(ToastElement, { closeOnEsc: false });
     const res = await controller.result;
 
     console.log('####', res);
