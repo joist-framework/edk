@@ -1,24 +1,24 @@
-import { DialogController } from './dialog-controller';
+import { ModalController } from './modal-controller';
 
 import { FocusManager } from '../utils/focus-manager';
 import { animate } from '../utils/animate';
 
-export interface DialogManagerOptions {
+export interface ModalManagerOptions {
   showOverlay?: boolean;
 }
 
-export class DialogManager {
-  public controllers = new Set<DialogController>();
+export class ModalManager {
+  public controllers = new Set<ModalController>();
 
   private overlay: HTMLElement | null = null;
   private previouslyActive: HTMLElement | null = null;
   private focusManager: FocusManager | null = null;
 
-  constructor(private root: HTMLElement, private opts: DialogManagerOptions = {}) {
+  constructor(private root: HTMLElement, private opts: ModalManagerOptions = {}) {
     this.addKeyUpListener();
   }
 
-  open<T extends DialogController>(Modal: new (...args: any[]) => T, props: Partial<T> = {}): T {
+  open<T extends ModalController>(Modal: new (...args: any[]) => T, props: Partial<T> = {}): T {
     const controller = new Modal();
 
     for (let prop in props) {
@@ -76,7 +76,7 @@ export class DialogManager {
     document.addEventListener('keyup', onKeyUp);
   }
 
-  private onClose(controller: DialogController) {
+  private onClose(controller: ModalController) {
     this.controllers.delete(controller);
 
     if (this.controllers.size === 0) {

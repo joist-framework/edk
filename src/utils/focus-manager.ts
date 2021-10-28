@@ -1,9 +1,18 @@
-export function getFocusableEls(element: HTMLElement) {
-  return Array.from(
-    element.querySelectorAll<HTMLElement>(
-      '[tabindex], a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled])'
-    )
-  ).filter((el) => !Object.keys(el.dataset).includes('focusTrapSkip'));
+export function getFocusableEls(element: HTMLElement, selector?: string[]) {
+  const select = selector || [
+    '[tabindex]',
+    'a[href]:not([disabled])',
+    'button:not([disabled])',
+    'textarea:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+  ];
+
+  const elements = Array.from(element.querySelectorAll<HTMLElement>(select.join(', ')));
+
+  return elements
+    .filter((el) => !Object.keys(el.dataset).includes('focusTrapSkip'))
+    .sort((a, b) => a.tabIndex - b.tabIndex);
 }
 
 export class FocusManager {

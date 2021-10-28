@@ -1,6 +1,6 @@
 import { animate } from '../utils/animate';
 
-export class DialogController<R = any> extends HTMLElement {
+export class ModalController<R = any> extends HTMLElement {
   private resolve: (value?: R) => void = () => void 0;
   private modalRoot?: HTMLElement;
 
