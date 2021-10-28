@@ -148,6 +148,7 @@ export const Toast = () => {
   return html`
     <style>
       app-toast {
+        font-family: Arial, Helvetica, sans-serif;
         border-radius: 4px;
         background: green;
         box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.1);
