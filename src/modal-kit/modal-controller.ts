@@ -1,4 +1,4 @@
-import { animate } from '../utils/animate.js';
+import { animate } from '../utils/animate';
 
 export class ModalEvent extends Event {}
 
@@ -18,10 +18,10 @@ export class ModalController<R = any> extends HTMLElement {
       this.modalRoot.appendChild(this);
 
       animate(this, 'modal-enter').then(() => {
-        this.dispatchEvent(new ModalEvent('modalafteropened'));
+        this.dispatchEvent(new ModalEvent('modalafteropened', { bubbles: true }));
       });
 
-      this.dispatchEvent(new ModalEvent('modalopened'));
+      this.dispatchEvent(new ModalEvent('modalopened', { bubbles: true }));
     }
   }
 
@@ -33,7 +33,7 @@ export class ModalController<R = any> extends HTMLElement {
         this.modalRoot.removeChild(this);
       }
 
-      this.dispatchEvent(new ModalEvent('modalclosed'));
+      this.dispatchEvent(new ModalEvent('modalclosed', { bubbles: true }));
 
       return this;
     });

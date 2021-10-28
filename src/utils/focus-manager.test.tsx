@@ -1,6 +1,6 @@
 import { html, fixture, expect } from '@open-wc/testing';
 
-import { FocusManager, getFocusableEls } from './focus-manager.js';
+import { FocusManager, getFocusableEls } from './focus-manager';
 
 describe('utils: focus-trap', () => {
   it('should return a list of focusable elements sorted by tabindex', async () => {

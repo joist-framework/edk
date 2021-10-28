@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 
-import { ModalController } from './modal-controller.js';
+import { ModalController } from './modal-controller';
 
 customElements.define('modal-controller-test', ModalController);
 
@@ -36,5 +36,57 @@ describe('ModalController', () => {
     const res = await controller.result;
 
     expect(res).to.equal('Hello World');
+  });
+
+  it('should dispatch modalopened event', async () => {
+    const container = document.createElement('div');
+    const controller = new ModalController<string>();
+
+    return new Promise((resolve) => {
+      controller.addEventListener('modalopened', (e) => {
+        const target = e.target as HTMLElement;
+
+        expect(target.tagName).to.equal('MODAL-CONTROLLER-TEST');
+
+        resolve();
+      });
+
+      controller.open(container);
+    });
+  });
+
+  it('should dispatch aftermodalopened event', async () => {
+    const container = document.createElement('div');
+    const controller = new ModalController<string>();
+
+    return new Promise((resolve) => {
+      controller.addEventListener('modalafteropened', (e) => {
+        const target = e.target as HTMLElement;
+
+        expect(target.tagName).to.equal('MODAL-CONTROLLER-TEST');
+
+        resolve();
+      });
+
+      controller.open(container);
+    });
+  });
+
+  it('should dispatch modalclosed event', async () => {
+    const container = document.createElement('div');
+    const controller = new ModalController<string>();
+
+    return new Promise((resolve) => {
+      controller.addEventListener('modalclosed', (e) => {
+        const target = e.target as HTMLElement;
+
+        expect(target.tagName).to.equal('MODAL-CONTROLLER-TEST');
+
+        resolve();
+      });
+
+      controller.open(container);
+      controller.close();
+    });
   });
 });

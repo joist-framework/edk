@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 
-import { animate } from './animate.js';
+import { animate } from './animate';
 
 describe('utils: animate', () => {
   it('should resolve when the animation is complete', async () => {

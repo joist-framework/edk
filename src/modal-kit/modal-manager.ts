@@ -1,7 +1,7 @@
 import { ModalController } from './modal-controller';
 
-import { FocusManager } from '../utils/focus-manager.js';
-import { animate } from '../utils/animate.js';
+import { FocusManager } from '../utils/focus-manager';
+import { animate } from '../utils/animate';
 
 export interface ModalManagerOptions {
   showOverlay?: boolean;

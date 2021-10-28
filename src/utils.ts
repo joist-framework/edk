@@ -1,2 +1,2 @@
-export { animate } from './utils/animate.js';
-export { FocusManager, getFocusableEls } from './utils/focus-manager.js';
+export { animate } from './utils/animate';
+export { FocusManager, getFocusableEls } from './utils/focus-manager';
