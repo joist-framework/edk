@@ -8,7 +8,7 @@ export default {
   title: 'modal',
 } as Meta;
 
-class MyModal extends ModalController<FormData> {
+class MyDialog extends ModalController<FormData> {
   fname: string = '';
   lname: string = '';
 
@@ -39,13 +39,13 @@ class MyModal extends ModalController<FormData> {
   }
 }
 
-customElements.define('test-modal', MyModal);
+customElements.define('my-dialog', MyDialog);
 
-export const Default = () => {
+export const Dialog = () => {
   const modal = new ModalManager(document.body, { showOverlay: true });
 
   async function openModal() {
-    const controller = await modal.open(MyModal, { fname: 'Danny' });
+    const controller = await modal.open(MyDialog, { fname: 'Danny' });
     const res = await controller.result;
 
     console.log('####', res);
@@ -53,7 +53,7 @@ export const Default = () => {
 
   return html`
     <style>
-      test-modal {
+      my-dialog {
         border-radius: 8px;
         background: #fff;
         box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.1);
@@ -91,6 +91,77 @@ export const Default = () => {
       }
 
       .modal-overlay-exit,
+      .modal-exit {
+        animation: fadeout 0.2s;
+      }
+
+      @keyframes fadein {
+        0% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeout {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+    </style>
+
+    <button @click="${openModal}">Open</button>
+  `;
+};
+
+class ToastElement extends ModalController<FormData> {
+  connectedCallback() {
+    this.render();
+  }
+
+  private render() {
+    return render(this.template(), this);
+  }
+
+  private template() {
+    return html`Thiis is a toast message! <button @click=${() => this.close()}>X</button>`;
+  }
+}
+
+customElements.define('app-toast', ToastElement);
+
+export const Toast = () => {
+  const modal = new ModalManager(document.body, { showOverlay: false });
+
+  async function openModal() {
+    const controller = await modal.open(ToastElement);
+    const res = await controller.result;
+
+    console.log('####', res);
+  }
+
+  return html`
+    <style>
+      app-toast {
+        border-radius: 4px;
+        background: green;
+        box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.1);
+        display: flex;
+        padding: 1rem;
+        z-index: 1001;
+        color: #fff;
+        margin-top: 1rem;
+      }
+
+      .modal-enter {
+        animation: fadein 0.3s;
+      }
+
       .modal-exit {
         animation: fadeout 0.2s;
       }
