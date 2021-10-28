@@ -43,7 +43,7 @@ describe('ModalController', () => {
     const controller = new ModalController<string>();
 
     return new Promise((resolve) => {
-      controller.addEventListener('modalopened', (e) => {
+      controller.addEventListener('modalopen', (e) => {
         const target = e.target as HTMLElement;
 
         expect(target.tagName).to.equal('MODAL-CONTROLLER-TEST');
@@ -60,7 +60,7 @@ describe('ModalController', () => {
     const controller = new ModalController<string>();
 
     return new Promise((resolve) => {
-      controller.addEventListener('modalafteropened', (e) => {
+      controller.addEventListener('modalafteropen', (e) => {
         const target = e.target as HTMLElement;
 
         expect(target.tagName).to.equal('MODAL-CONTROLLER-TEST');
@@ -77,7 +77,7 @@ describe('ModalController', () => {
     const controller = new ModalController<string>();
 
     return new Promise((resolve) => {
-      controller.addEventListener('modalclosed', (e) => {
+      controller.addEventListener('modalclose', (e) => {
         const target = e.target as HTMLElement;
 
         expect(target.tagName).to.equal('MODAL-CONTROLLER-TEST');

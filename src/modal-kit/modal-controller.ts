@@ -18,10 +18,10 @@ export class ModalController<R = any> extends HTMLElement {
       this.modalRoot.appendChild(this);
 
       animate(this, 'modal-enter').then(() => {
-        this.dispatchEvent(new ModalEvent('modalafteropened', { bubbles: true }));
+        this.dispatchEvent(new ModalEvent('modalafteropen', { bubbles: true }));
       });
 
-      this.dispatchEvent(new ModalEvent('modalopened', { bubbles: true }));
+      this.dispatchEvent(new ModalEvent('modalopen', { bubbles: true }));
     }
   }
 
@@ -33,7 +33,7 @@ export class ModalController<R = any> extends HTMLElement {
         this.modalRoot.removeChild(this);
       }
 
-      this.dispatchEvent(new ModalEvent('modalclosed', { bubbles: true }));
+      this.dispatchEvent(new ModalEvent('modalclose', { bubbles: true }));
 
       return this;
     });
