@@ -1,6 +1,6 @@
 import { html, fixture, expect } from '@open-wc/testing';
 
-import { FocusManager, getFocusableEls } from './focus-manager';
+import { FocusManager, getFocusableEls } from './focus-manager.js';
 
 describe('utils: focus-trap', () => {
   it('should exclude elements marked to skip', async () => {

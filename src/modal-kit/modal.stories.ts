@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/web-components';
 import { html, render, TemplateResult } from 'lit-html';
 
-import { ModalController } from './modal-controller';
-import { ModalManager } from './modal-manager';
+import { ModalController } from './modal-controller.js';
+import { ModalManager } from './modal-manager.js';
 
 export default {
   title: 'modal',

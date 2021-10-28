@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 
-import { ModalController } from './modal-controller';
+import { ModalController } from './modal-controller.js';
 
 customElements.define('modal-controller-test', ModalController);
 

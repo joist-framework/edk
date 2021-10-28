@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 
-import { ModalController } from './modal-controller';
-import { ModalManager } from './modal-manager';
+import { ModalController } from './modal-controller.js';
+import { ModalManager } from './modal-manager.js';
 
 class ModalManagerTest extends ModalController {
   foo: string = '';

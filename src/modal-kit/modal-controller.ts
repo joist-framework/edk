@@ -1,4 +1,4 @@
-import { animate } from '../utils/animate';
+import { animate } from '../utils/animate.js';
 
 export class ModalController<R = any> extends HTMLElement {
   private resolve: (value?: R) => void = () => void 0;
