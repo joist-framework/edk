@@ -27,7 +27,7 @@
     "lit-html": "2.0.1"
   },
   "devDependencies": {
-    "@babel/plugin-transform-typescript": "7.16.0",
+    "@babel/plugin-transform-typescript": "7.16.1",
     "@open-wc/testing": "3.0.2",
     "@storybook/addon-actions": "6.3.12",
     "@storybook/addon-essentials": "6.3.12",
