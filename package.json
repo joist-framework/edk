@@ -22,7 +22,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/plugin-transform-typescript": "7.15.8",
+    "@babel/plugin-transform-typescript": "7.16.0",
     "@open-wc/testing": "3.0.2",
     "@storybook/addon-actions": "6.3.12",
     "@storybook/addon-essentials": "6.3.12",
