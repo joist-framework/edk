@@ -30,11 +30,19 @@ export class ModalManager {
     document.addEventListener('keyup', this.onKeyUp);
   }
 
-  open<T extends ModalController>(Modal: new (...args: any[]) => T, props: Partial<T> = {}): T {
+  open<T extends ModalController>(
+    Modal: new (...args: any[]) => T,
+    props: Partial<T> = {},
+    children?: HTMLElement[]
+  ): T {
     const controller = new Modal();
 
     for (let prop in props) {
       controller[prop] = props[prop] as T[Extract<keyof T, string>];
+    }
+
+    if (children) {
+      controller.append(...children);
     }
 
     controller.open(this.root);
@@ -56,15 +64,22 @@ export class ModalManager {
     // stop any previous focus manager
     if (this.focusManager) {
       this.focusManager.stop();
+      this.focusManager = null;
     }
 
-    // Start up new forcus manager for modal
-    this.focusManager = new FocusManager(controller);
-    this.focusManager.start();
+    if (controller.captureFocus) {
+      // Add code to be run in the next event loop. This is required in case content is added after the modal is created
+      setTimeout(() => {
+        // Start up new forcus manager for modal
+        this.focusManager = new FocusManager(controller);
+        this.focusManager.start();
 
-    // focus of first focusable element
-    if (this.focusManager.firstFocusableEl) {
-      this.focusManager.firstFocusableEl.focus();
+        // focus of first focusable element
+        if (this.focusManager.firstFocusableEl) {
+          this.focusManager.firstFocusableEl.focus();
+        }
+        this.focusOn(controller);
+      }, 0);
     }
 
     controller.result.then(() => {
@@ -76,6 +91,17 @@ export class ModalManager {
 
   clean() {
     document.removeEventListener('keyup', this.onKeyUp);
+  }
+
+  focusOn(controller: ModalController) {
+    // Start up new forcus manager for modal
+    this.focusManager = new FocusManager(controller);
+    this.focusManager.start();
+
+    // focus of first focusable element
+    if (this.focusManager.firstFocusableEl) {
+      this.focusManager.firstFocusableEl.focus();
+    }
   }
 
   private onClose(controller: ModalController) {

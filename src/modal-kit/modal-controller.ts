@@ -7,6 +7,7 @@ export class ModalController<R = any> extends HTMLElement {
   private modalRoot?: HTMLElement;
 
   public closeOnEsc: boolean = false;
+  public captureFocus: boolean = false;
   public result = new Promise<R | undefined>((resolve) => {
     this.resolve = resolve;
   });

@@ -1,19 +1,11 @@
+import { PropChanges, property } from '@joist/component';
 import { render, html } from 'lit-html';
 
-export class Autocomplete extends HTMLElement {
-  __items: string[] = [];
+export class AutocompleteElement extends PropChanges(HTMLElement) {
+  items: string[] = [];
 
-  set items(val: string[]) {
-    this.__items = val;
-
-    this.render();
-  }
-
-  get items() {
-    return this.__items;
-  }
-
-  private filteredItems: string[] = [];
+  @property()
+  filteredItems: string[] = [];
 
   constructor() {
     super();
@@ -28,9 +20,12 @@ export class Autocomplete extends HTMLElement {
       const input = e.target as HTMLInputElement;
 
       this.filteredItems = await this.search(input.value);
-
-      this.render();
     });
+  }
+
+  onPropChanges() {
+    console.log(this.filteredItems);
+    this.render();
   }
 
   async search(val: string) {

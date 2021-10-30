@@ -1,9 +1,9 @@
 import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { Autocomplete } from './autocomplete';
+import { AutocompleteElement } from './autocomplete';
 
-customElements.define('test-autocomplete', Autocomplete);
+customElements.define('test-autocomplete', AutocompleteElement);
 
 export default {
   title: 'autocomplte',

@@ -28,6 +28,14 @@ describe('ModalController', () => {
     expect(controller.bar).to.equal('World');
   });
 
+  it('should append children to the controller', () => {
+    const container = document.createElement('div');
+    const manager = new ModalManager(container);
+    const controller = manager.open(ModalManagerTest, {}, [document.createElement('div')]);
+
+    expect(controller.children.length).to.equal(1);
+  });
+
   it('should apply and overlay', () => {
     const container = document.createElement('div');
     const manager = new ModalManager(container, { showOverlay: true });

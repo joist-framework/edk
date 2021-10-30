@@ -1,2 +1,2 @@
 export { InputMaskElement, format, applyInputMask } from './elements/input-mask';
-export { Autocomplete } from './elements/autocomplete';
+export { AutocompleteElement } from './elements/autocomplete';
