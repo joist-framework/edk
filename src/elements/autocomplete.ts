@@ -1,11 +1,20 @@
-import { PropChanges, property } from '@joist/component';
-import { render, html } from 'lit-html';
+import { RequieSlots } from '../utils/require-slots';
 
-export class AutocompleteElement extends PropChanges(HTMLElement) {
+const Template = document.createElement('template');
+Template.innerHTML = /* html */ `
+  <style>
+    :host {
+      display: inline-block;
+    }
+  </style>
+  
+  <slot name="input"></slot>
+
+  <slot name="list"></slot>
+`;
+
+export class AutocompleteElement extends RequieSlots(HTMLElement, ['input', 'list']) {
   items: string[] = [];
-
-  @property()
-  filteredItems: string[] = [];
 
   constructor() {
     super();
@@ -14,41 +23,35 @@ export class AutocompleteElement extends PropChanges(HTMLElement) {
   }
 
   connectedCallback() {
-    this.render();
+    this.verifyRequiredSlots();
+
+    const root = this.shadowRoot!;
+
+    root.appendChild(Template.content.cloneNode(true));
+
+    const container = this.querySelector('[slot="list"]')!;
 
     this.addEventListener('input', async (e) => {
       const input = e.target as HTMLInputElement;
 
-      this.filteredItems = await this.search(input.value);
+      container.innerHTML = '';
+
+      const filteredItems = await this.search(input.value);
+
+      filteredItems.forEach((item) => {
+        container.appendChild(this.createItem(item));
+      });
     });
   }
 
-  onPropChanges() {
-    console.log(this.filteredItems);
-    this.render();
+  createItem(item: string): HTMLElement {
+    const el = document.createElement('div');
+    el.innerHTML = item;
+
+    return el;
   }
 
   async search(val: string) {
     return this.items.filter((item) => item.toLowerCase().startsWith(val.toLowerCase()));
-  }
-
-  private template() {
-    return html`
-      <style>
-        :host {
-          display: inline-block;
-        }
-      </style>
-
-      <slot name="input"></slot>
-
-      <ul class="autocomplete-list">
-        ${this.filteredItems.map((item) => html`<li>${item}</li>`)}
-      </ul>
-    `;
-  }
-
-  private render() {
-    render(this.template(), this.shadowRoot!);
   }
 }

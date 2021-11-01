@@ -2,6 +2,8 @@
 /utils
 /elements
 /modal-kit
+/build
 *.d.ts
 *.js
 *.js.map
+!docs/**/*.js

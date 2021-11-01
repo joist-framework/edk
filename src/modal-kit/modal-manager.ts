@@ -31,18 +31,19 @@ export class ModalManager {
   }
 
   open<T extends ModalController>(
-    Modal: new (...args: any[]) => T,
-    props: Partial<T> = {},
-    children?: HTMLElement[]
+    Modal: (new (...args: any[]) => T) | (() => T),
+    props: Partial<T> = {}
   ): T {
-    const controller = new Modal();
+    let controller: T;
+
+    try {
+      controller = new (Modal as new (...args: any[]) => T)();
+    } catch {
+      controller = (Modal as () => T)();
+    }
 
     for (let prop in props) {
       controller[prop] = props[prop] as T[Extract<keyof T, string>];
-    }
-
-    if (children) {
-      controller.append(...children);
     }
 
     controller.open(this.root);

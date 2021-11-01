@@ -19,6 +19,14 @@ describe('ModalController', () => {
     expect(container.contains(controller)).to.equal(true);
   });
 
+  it('should allow a factory function as well as a class', () => {
+    const container = document.createElement('div');
+    const manager = new ModalManager(container);
+    const controller = manager.open(() => new ModalManagerTest());
+
+    expect(container.contains(controller)).to.equal(true);
+  });
+
   it('should apply correct props to the controller', () => {
     const container = document.createElement('div');
     const manager = new ModalManager(container);
@@ -26,14 +34,6 @@ describe('ModalController', () => {
 
     expect(controller.foo).to.equal('Hello');
     expect(controller.bar).to.equal('World');
-  });
-
-  it('should append children to the controller', () => {
-    const container = document.createElement('div');
-    const manager = new ModalManager(container);
-    const controller = manager.open(ModalManagerTest, {}, [document.createElement('div')]);
-
-    expect(controller.children.length).to.equal(1);
   });
 
   it('should apply and overlay', () => {

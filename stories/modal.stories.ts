@@ -42,7 +42,8 @@ class MyDialog extends ModalController<FormData> {
 customElements.define('my-dialog', MyDialog);
 
 export const Dialog = () => {
-  const modal = new ModalManager(document.body, { showOverlay: true });
+  const modalRoot = document.createElement('div');
+  const modal = new ModalManager(modalRoot, { showOverlay: true });
 
   async function openModal() {
     const controller = await modal.open(MyDialog, { fname: 'Danny', closeOnEsc: true });
@@ -116,6 +117,8 @@ export const Dialog = () => {
     </style>
 
     <button @click="${openModal}">Open</button>
+
+    ${modalRoot}
   `;
 };
 
@@ -136,7 +139,8 @@ class ToastElement extends ModalController<FormData> {
 customElements.define('app-toast', ToastElement);
 
 export const Toast = () => {
-  const modal = new ModalManager(document.body, { showOverlay: false });
+  const modalRoot = document.createElement('div');
+  const modal = new ModalManager(modalRoot, { showOverlay: false });
 
   async function openModal() {
     const controller = await modal.open(ToastElement, { closeOnEsc: false });

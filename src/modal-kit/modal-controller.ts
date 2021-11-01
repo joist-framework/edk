@@ -8,7 +8,8 @@ export class ModalController<R = any> extends HTMLElement {
 
   public closeOnEsc: boolean = false;
   public captureFocus: boolean = false;
-  public result = new Promise<R | undefined>((resolve) => {
+
+  public readonly result = new Promise<R | undefined>((resolve) => {
     this.resolve = resolve;
   });
 
