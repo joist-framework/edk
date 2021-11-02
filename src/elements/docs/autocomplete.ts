@@ -62,6 +62,15 @@ class StateAutocompleteElement extends AutocompleteElement {
     'Wisconsin',
     'Wyoming',
   ];
+
+  createItem(item: string) {
+    const el = document.createElement('button');
+
+    el.innerHTML = item;
+    el.style.display = 'block';
+
+    return el;
+  }
 }
 
 customElements.define('state-autocomplete', StateAutocompleteElement);

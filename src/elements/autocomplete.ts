@@ -1,3 +1,4 @@
+import { getFocusableEls } from '../utils';
 import { RequieSlots } from '../utils/require-slots';
 
 const Template = document.createElement('template');
@@ -16,6 +17,9 @@ Template.innerHTML = /* html */ `
 export class AutocompleteElement extends RequieSlots(HTMLElement, ['input', 'list']) {
   items: string[] = [];
 
+  private focusedIndex: number | null = null;
+  private listContainer: HTMLElement | null = null;
+
   constructor() {
     super();
 
@@ -23,25 +27,27 @@ export class AutocompleteElement extends RequieSlots(HTMLElement, ['input', 'lis
   }
 
   connectedCallback() {
-    this.verifyRequiredSlots();
+    this.listContainer = this.querySelector('[slot="list"]')!;
 
     const root = this.shadowRoot!;
 
     root.appendChild(Template.content.cloneNode(true));
 
-    const container = this.querySelector('[slot="list"]')!;
-
     this.addEventListener('input', async (e) => {
       const input = e.target as HTMLInputElement;
 
-      container.innerHTML = '';
+      this.listContainer!.innerHTML = '';
+
+      this.focusedIndex = null;
 
       const filteredItems = await this.search(input.value);
 
       filteredItems.forEach((item) => {
-        container.appendChild(this.createItem(item));
+        this.listContainer!.appendChild(this.createItem(item));
       });
     });
+
+    this.addEventListener('keydown', this.onKeyDown.bind(this));
   }
 
   createItem(item: string): HTMLElement {
@@ -53,5 +59,36 @@ export class AutocompleteElement extends RequieSlots(HTMLElement, ['input', 'lis
 
   async search(val: string) {
     return this.items.filter((item) => item.toLowerCase().startsWith(val.toLowerCase()));
+  }
+
+  onKeyDown(e: KeyboardEvent) {
+    const key = e.key.toUpperCase();
+
+    if (['ARROWDOWN', 'ARROWUP'].includes(key)) {
+      e.preventDefault();
+
+      const focusable = getFocusableEls(this.listContainer!);
+
+      switch (key) {
+        case 'ARROWDOWN':
+          if (this.focusedIndex === null) {
+            this.focusedIndex = 0;
+          } else {
+            this.focusedIndex = this.focusedIndex + 1;
+          }
+
+          focusable[this.focusedIndex]!.focus();
+
+          break;
+
+        case 'ARROWUP':
+          if (this.focusedIndex !== null && this.focusedIndex > 0) {
+            this.focusedIndex = this.focusedIndex - 1;
+            focusable[this.focusedIndex]!.focus();
+          }
+
+          break;
+      }
+    }
   }
 }
