@@ -10,6 +10,7 @@ export default {
 } as Meta;
 
 customElements.define('my-dialog', MyDialog);
+customElements.define('app-toast', ToastElement);
 
 export const Dialog = () => {
   const modalRoot = document.createElement('div');
@@ -48,7 +49,6 @@ export const Dialog = () => {
         0% {
           opacity: 0;
         }
-
         100% {
           opacity: 1;
         }
@@ -70,17 +70,12 @@ export const Dialog = () => {
   `;
 };
 
-customElements.define('app-toast', ToastElement);
-
 export const Toast = () => {
   const modalRoot = document.createElement('div');
-  const modal = new ModalManager(modalRoot, { showOverlay: false });
+  const toast = new ModalManager(modalRoot, { showOverlay: false });
 
   async function openModal() {
-    const controller = await modal.open(ToastElement, { closeOnEsc: false });
-    const res = await controller.result;
-
-    console.log('####', res);
+    toast.open(ToastElement, { closeOnEsc: false });
   }
 
   return html`
