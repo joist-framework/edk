@@ -8,9 +8,9 @@ export function getFocusableEls(element: HTMLElement | ShadowRoot, selector?: st
     'select:not([disabled])',
   ];
 
-  const elements = Array.from(element.querySelectorAll<HTMLElement>(select.join(', ')));
+  const elements = element.querySelectorAll<HTMLElement>(select.join(', '));
 
-  return elements
+  return Array.from(elements)
     .filter((el) => !Object.keys(el.dataset).includes('focusTrapSkip'))
     .sort((a, b) => a.tabIndex - b.tabIndex);
 }
@@ -19,29 +19,24 @@ export class FocusManager {
   firstFocusableEl?: HTMLElement;
   lastFocusableEl?: HTMLElement;
 
+  private element: HTMLElement | ShadowRoot | null = null;
   private focusableEls: HTMLElement[] = [];
   private listener = this.onKeyDown.bind(this);
 
-  // Have to handle this way to make storybook happy
-  constructor(private element: HTMLElement | ShadowRoot) {
-    this.update();
-  }
+  start(element: HTMLElement | ShadowRoot) {
+    this.element = element;
 
-  update() {
     this.focusableEls = getFocusableEls(this.element);
-
-    console.log(this.focusableEls);
-
     this.firstFocusableEl = this.focusableEls[0];
     this.lastFocusableEl = this.focusableEls[this.focusableEls.length - 1];
-  }
 
-  start() {
     this.element.addEventListener('keydown', this.listener);
   }
 
   stop() {
-    this.element.removeEventListener('keydown', this.listener);
+    if (this.element) {
+      this.element.removeEventListener('keydown', this.listener);
+    }
   }
 
   private onKeyDown(e: Event) {
