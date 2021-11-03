@@ -16,8 +16,8 @@ export function getFocusableEls(element: HTMLElement | ShadowRoot, selector?: st
 }
 
 export class FocusManager {
-  firstFocusableEl?: HTMLElement;
-  lastFocusableEl?: HTMLElement;
+  firstFocusableEl: HTMLElement | null = null;
+  lastFocusableEl: HTMLElement | null = null;
 
   private element: HTMLElement | ShadowRoot | null = null;
   private focusableEls: HTMLElement[] = [];
@@ -27,13 +27,17 @@ export class FocusManager {
     this.element = element;
 
     this.focusableEls = getFocusableEls(this.element);
-    this.firstFocusableEl = this.focusableEls[0];
-    this.lastFocusableEl = this.focusableEls[this.focusableEls.length - 1];
+    this.firstFocusableEl = this.focusableEls[0] || null;
+    this.lastFocusableEl = this.focusableEls[this.focusableEls.length - 1] || null;
 
     this.element.addEventListener('keydown', this.listener);
   }
 
   stop() {
+    this.focusableEls = [];
+    this.firstFocusableEl = null;
+    this.lastFocusableEl = null;
+
     if (this.element) {
       this.element.removeEventListener('keydown', this.listener);
     }

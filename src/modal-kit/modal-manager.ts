@@ -1,8 +1,8 @@
 import { ModalController } from './modal-controller';
 
 import { FocusManager } from '../utils/focus-manager';
+import { ScrollManager } from '../utils/scroll-manager';
 import { animate } from '../utils/animate';
-import { freezeScroll, releaseScroll } from '../utils/scroll';
 
 export interface ModalManagerOptions {
   showOverlay?: boolean;
@@ -14,6 +14,7 @@ export class ModalManager {
   public controllers = new Set<ModalController>();
 
   private focusManager = new FocusManager();
+  private scrollManager = new ScrollManager();
   private overlay: HTMLElement | null = null;
   private previouslyActive: HTMLElement | null = null;
   private document: Document | ShadowRoot;
@@ -48,7 +49,10 @@ export class ModalManager {
 
     this.previouslyActive = this.document.activeElement as HTMLElement;
 
-    freezeScroll();
+    // Freeze any background scrolling
+    if (this.opts.freezeScroll) {
+      this.scrollManager.freezeScroll();
+    }
 
     // Handle adding a single overlay
     if (this.opts.showOverlay && !this.overlay) {
@@ -110,8 +114,7 @@ export class ModalManager {
   }
 
   private onClose(controller: ModalController) {
-    releaseScroll();
-
+    this.scrollManager.releaseScroll();
     this.controllers.delete(controller);
 
     if (this.controllers.size === 0) {
