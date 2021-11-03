@@ -19,6 +19,7 @@ export class AutocompleteElement extends RequieSlots(HTMLElement, ['input', 'lis
 
   private focusedIndex: number | null = null;
   private listContainer: HTMLElement | null = null;
+  private input: HTMLInputElement | null = null;
 
   constructor() {
     super();
@@ -27,24 +28,39 @@ export class AutocompleteElement extends RequieSlots(HTMLElement, ['input', 'lis
   }
 
   connectedCallback() {
-    this.listContainer = this.querySelector('[slot="list"]')!;
-
     const root = this.shadowRoot!;
 
     root.appendChild(Template.content.cloneNode(true));
 
+    this.input = this.querySelector('[slot="input"]')!;
+    this.listContainer = this.querySelector('[slot="list"]')!;
+
     this.addEventListener('input', async (e) => {
       const input = e.target as HTMLInputElement;
 
-      this.listContainer!.innerHTML = '';
-
       this.focusedIndex = null;
+
+      this.listContainer!.innerHTML = '';
 
       const filteredItems = await this.search(input.value);
 
       filteredItems.forEach((item) => {
-        this.listContainer!.appendChild(this.createItem(item));
+        const el = this.createItem(item);
+
+        el.dataset.value = item;
+
+        this.listContainer!.appendChild(el);
       });
+    });
+
+    this.addEventListener('focusout', () => {
+      setTimeout(() => {
+        // This needs to be in a timeout so that it runs as part of the next loop.
+        // the active element will not be set until after all of the focus and blur events are done
+        if (!this.contains(document.activeElement)) {
+          this.listContainer!.innerHTML = '';
+        }
+      }, 0);
     });
 
     this.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -61,34 +77,51 @@ export class AutocompleteElement extends RequieSlots(HTMLElement, ['input', 'lis
     return this.items.filter((item) => item.toLowerCase().startsWith(val.toLowerCase()));
   }
 
-  onKeyDown(e: KeyboardEvent) {
+  private onKeyDown(e: KeyboardEvent) {
+    const target = e.target as HTMLElement;
     const key = e.key.toUpperCase();
+    const focusable = getFocusableEls(this.listContainer!);
 
-    if (['ARROWDOWN', 'ARROWUP'].includes(key)) {
-      e.preventDefault();
+    switch (key) {
+      case 'ARROWDOWN':
+        e.preventDefault();
 
-      const focusable = getFocusableEls(this.listContainer!);
+        if (this.focusedIndex === null) {
+          this.focusedIndex = 0;
+        } else {
+          this.focusedIndex = this.focusedIndex + 1;
+        }
 
-      switch (key) {
-        case 'ARROWDOWN':
-          if (this.focusedIndex === null) {
-            this.focusedIndex = 0;
-          } else {
-            this.focusedIndex = this.focusedIndex + 1;
-          }
+        const focusableItem = focusable[this.focusedIndex];
 
+        if (focusableItem) {
           focusable[this.focusedIndex]!.focus();
+        }
 
-          break;
+        break;
 
-        case 'ARROWUP':
-          if (this.focusedIndex !== null && this.focusedIndex > 0) {
-            this.focusedIndex = this.focusedIndex - 1;
+      case 'ARROWUP':
+        e.preventDefault();
+
+        if (this.focusedIndex !== null && this.focusedIndex > 0) {
+          this.focusedIndex = this.focusedIndex - 1;
+
+          const focusableItem = focusable[this.focusedIndex];
+
+          if (focusableItem) {
             focusable[this.focusedIndex]!.focus();
           }
+        }
 
-          break;
-      }
+        break;
+
+      case 'ENTER':
+        e.preventDefault();
+
+        this.input!.value = target.dataset.value || '';
+        this.listContainer!.innerHTML = '';
+
+        break;
     }
   }
 }

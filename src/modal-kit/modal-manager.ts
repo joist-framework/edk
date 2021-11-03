@@ -71,14 +71,6 @@ export class ModalManager {
     if (controller.captureFocus) {
       // Add code to be run in the next event loop. This is required in case content is added after the modal is created
       setTimeout(() => {
-        // Start up new forcus manager for modal
-        this.focusManager = new FocusManager(controller);
-        this.focusManager.start();
-
-        // focus of first focusable element
-        if (this.focusManager.firstFocusableEl) {
-          this.focusManager.firstFocusableEl.focus();
-        }
         this.focusOn(controller);
       }, 0);
     }
@@ -96,7 +88,7 @@ export class ModalManager {
 
   focusOn(controller: ModalController) {
     // Start up new forcus manager for modal
-    this.focusManager = new FocusManager(controller);
+    this.focusManager = new FocusManager(controller.shadowRoot || controller);
     this.focusManager.start();
 
     // focus of first focusable element
