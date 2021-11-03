@@ -27,11 +27,13 @@ export class ModalManager {
     }
   };
 
-  constructor(
-    private root: HTMLElement,
-    private opts: ModalManagerOptions = { document: document }
-  ) {
+  constructor(private root: HTMLElement, private opts: ModalManagerOptions) {
     document.addEventListener('keyup', this.onKeyUp);
+
+    this.opts = {
+      document: document,
+      ...this.opts,
+    };
   }
 
   open<T extends ModalController>(
