@@ -5,6 +5,8 @@ import { ModalController } from '../modal-controller';
 export class MyDialog extends ModalController<FormData> {
   fname: string = '';
   lname: string = '';
+  closeOnEsc = true;
+  captureFocus = true;
 
   constructor() {
     super();

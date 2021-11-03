@@ -57,7 +57,8 @@ describe('utils: focus-trap', () => {
       </form>
     `);
 
-    const focusTrap = new FocusManager(container);
+    const focusTrap = new FocusManager();
+    focusTrap.start(container);
 
     expect(focusTrap.firstFocusableEl?.getAttribute('name')).to.equal('fname');
     expect(focusTrap.lastFocusableEl?.innerHTML).to.equal('Submit');
@@ -76,8 +77,9 @@ describe('utils: focus-trap', () => {
       </form>
     `);
 
-    const focusTrap = new FocusManager(container);
-    focusTrap.start();
+    const focusTrap = new FocusManager();
+    focusTrap.start(container);
+
     focusTrap.lastFocusableEl?.focus();
 
     container.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
@@ -98,8 +100,8 @@ describe('utils: focus-trap', () => {
       </form>
     `);
 
-    const focusTrap = new FocusManager(container);
-    focusTrap.start();
+    const focusTrap = new FocusManager();
+    focusTrap.start(container);
     focusTrap.firstFocusableEl?.focus();
 
     container.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true }));

@@ -14,6 +14,7 @@ export class ModalManager {
   private focusManager = new FocusManager();
   private overlay: HTMLElement | null = null;
   private previouslyActive: HTMLElement | null = null;
+  private document: Document | ShadowRoot;
 
   private onKeyUp = (e: KeyboardEvent) => {
     if (e.key.toUpperCase() === 'ESCAPE') {
@@ -27,13 +28,10 @@ export class ModalManager {
     }
   };
 
-  constructor(private root: HTMLElement, private opts: ModalManagerOptions) {
+  constructor(private root: HTMLElement, private opts: ModalManagerOptions = {}) {
     document.addEventListener('keyup', this.onKeyUp);
 
-    this.opts = {
-      document: document,
-      ...this.opts,
-    };
+    this.document = this.opts.document || document;
   }
 
   open<T extends ModalController>(
@@ -46,7 +44,7 @@ export class ModalManager {
 
     controller.open(this.root);
 
-    this.previouslyActive = this.opts.document!.activeElement as HTMLElement;
+    this.previouslyActive = this.document.activeElement as HTMLElement;
 
     // Handle adding a single overlay
     if (this.opts.showOverlay && !this.overlay) {

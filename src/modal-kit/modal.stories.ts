@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/web-components';
-import { html, render } from 'lit-html';
-import { MyDialog } from './examples/dialog';
+import { html } from 'lit-html';
 
-import { ModalController } from './modal-controller';
+import { MyDialog } from './examples/dialog';
+import { ToastElement } from './examples/toast';
 import { ModalManager } from './modal-manager';
 
 export default {
@@ -16,11 +16,7 @@ export const Dialog = () => {
   const modal = new ModalManager(modalRoot, { showOverlay: true });
 
   async function openModal() {
-    const controller = await modal.open(MyDialog, {
-      fname: 'Danny',
-      closeOnEsc: true,
-      captureFocus: true,
-    });
+    const controller = modal.open(MyDialog, { fname: 'Danny' });
     const res = await controller.result;
 
     console.log('####', res);
@@ -73,20 +69,6 @@ export const Dialog = () => {
     ${modalRoot}
   `;
 };
-
-class ToastElement extends ModalController<FormData> {
-  connectedCallback() {
-    this.render();
-  }
-
-  private render() {
-    return render(this.template(), this);
-  }
-
-  private template() {
-    return html`Thiis is a toast message! <button @click=${() => this.close()}>X</button>`;
-  }
-}
 
 customElements.define('app-toast', ToastElement);
 
