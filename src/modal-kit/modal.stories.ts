@@ -20,7 +20,7 @@ export const Dialog = () => {
     const el = modal.open(DialogElement, { fname: 'Danny' });
     const res = await el.controller.result;
 
-    console.log('####', res);
+    console.log('####', res ? res.values() : res);
   }
 
   return html`

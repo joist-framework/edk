@@ -1,3 +1,4 @@
+import { FocusManager } from '../utils';
 import { animate } from '../utils/animate';
 
 export class ModalEvent extends Event {}
@@ -13,6 +14,7 @@ export interface ModalControllerConfig {
 
 export class ModalController<R = any> implements ModalControllerConfig {
   private resolve: (value?: R) => void = () => void 0;
+  private focusManager = new FocusManager();
 
   public closeOnEsc = false;
   public captureFocus = false;
@@ -31,6 +33,10 @@ export class ModalController<R = any> implements ModalControllerConfig {
       this.el.dispatchEvent(new ModalEvent('modalafteropen', { bubbles: true }));
     });
 
+    if (this.captureFocus) {
+      this.focus();
+    }
+
     this.el.dispatchEvent(new ModalEvent('modalopen', { bubbles: true }));
   }
 
@@ -41,6 +47,21 @@ export class ModalController<R = any> implements ModalControllerConfig {
       this.el.dispatchEvent(new ModalEvent('modalclose', { bubbles: true }));
 
       return this;
+    });
+  }
+
+  private focus() {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        this.focusManager.start(this.el.shadowRoot || this.el);
+
+        // focus of first focusable element
+        if (this.focusManager.firstFocusableEl) {
+          this.focusManager.firstFocusableEl.focus();
+        }
+
+        resolve();
+      }, 0);
     });
   }
 }

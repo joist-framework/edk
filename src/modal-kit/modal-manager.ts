@@ -1,6 +1,5 @@
 import { Modal, ModalController } from './modal-controller';
 
-import { FocusManager } from '../utils/focus-manager';
 import { ScrollManager } from '../utils/scroll-manager';
 import { animate } from '../utils/animate';
 
@@ -16,7 +15,6 @@ export type ModalFactory<T> = () => T;
 
 export class ModalManager {
   private controllers = new Set<ModalController>();
-  private focusManager = new FocusManager();
   private scrollManager = new ScrollManager();
   private overlay: HTMLElement | null = null;
   private previouslyActive: HTMLElement | null = null;
@@ -63,16 +61,6 @@ export class ModalManager {
       this.applyOverlay();
     }
 
-    // stop any previous focus manager
-    this.focusManager.stop();
-
-    if (modal.controller.captureFocus) {
-      // Add code to be run in the next event loop. This is required in case content is added after the modal is created
-      setTimeout(() => {
-        this.focusOn(modal);
-      }, 0);
-    }
-
     modal.controller.result.then(() => {
       this.onClose(modal);
     });
@@ -82,15 +70,6 @@ export class ModalManager {
 
   clean() {
     document.removeEventListener('keyup', this.onKeyUp);
-  }
-
-  focusOn(controller: Modal & HTMLElement) {
-    this.focusManager.start(controller.shadowRoot || controller);
-
-    // focus of first focusable element
-    if (this.focusManager.firstFocusableEl) {
-      this.focusManager.firstFocusableEl.focus();
-    }
   }
 
   createModal<T extends ModalElement>(
@@ -134,8 +113,6 @@ export class ModalManager {
           this.overlay = null;
         });
       }
-
-      this.focusManager.stop();
 
       if (this.previouslyActive) {
         this.previouslyActive.focus();

@@ -2,7 +2,7 @@ import { html, render } from 'lit-html';
 
 import { WithModal } from '../modal-controller';
 
-const Dialog = WithModal({ closeOnEsc: true, captureFocus: true });
+const Dialog = WithModal<FormData>({ closeOnEsc: true, captureFocus: true });
 
 export class DialogElement extends Dialog(HTMLElement) {
   fname: string = '';
