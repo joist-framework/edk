@@ -1,5 +1,6 @@
 import { FocusManager } from '../utils';
 import { animate } from '../utils/animate';
+import { ScrollManager } from '../utils/scroll-manager';
 
 export class ModalEvent extends Event {}
 
@@ -7,26 +8,31 @@ export interface Modal<T = any> {
   controller: ModalController<T>;
 }
 
-export interface ModalControllerConfig {
+export interface ModalConfig {
   closeOnEsc: boolean;
   captureFocus: boolean;
+  freezeScroll: boolean;
 }
 
-export class ModalController<R = any> implements ModalControllerConfig {
+export class ModalController<R = any> implements ModalConfig {
   private resolve: (value?: R) => void = () => void 0;
   private focusManager = new FocusManager();
+  private scrollManager = new ScrollManager();
   private previouslyActive: HTMLElement | null = null;
 
-  public closeOnEsc = false;
-  public captureFocus = false;
+  public closeOnEsc: boolean;
+  public captureFocus: boolean;
+  public freezeScroll: boolean;
 
   public readonly result = new Promise<R | undefined>((resolve) => {
     this.resolve = resolve;
   });
 
-  constructor(private el: HTMLElement, config: Partial<ModalControllerConfig> = {}) {
+  constructor(private el: HTMLElement, config: Partial<ModalConfig> = {}) {
     this.closeOnEsc = config.closeOnEsc || false;
     this.captureFocus = config.captureFocus || false;
+    this.freezeScroll = config.freezeScroll || false;
+
     this.previouslyActive = document.activeElement as HTMLElement;
   }
 
@@ -37,6 +43,11 @@ export class ModalController<R = any> implements ModalControllerConfig {
 
     if (this.captureFocus) {
       this.focus();
+    }
+
+    // Freeze any background scrolling
+    if (this.freezeScroll) {
+      this.scrollManager.freezeScroll();
     }
 
     this.el.dispatchEvent(new ModalEvent('modalopen', { bubbles: true }));
@@ -52,11 +63,13 @@ export class ModalController<R = any> implements ModalControllerConfig {
     return animate(this.el, 'modal-exit').then(() => {
       this.el.dispatchEvent(new ModalEvent('modalclose', { bubbles: true }));
 
+      this.scrollManager.releaseScroll();
+
       return this;
     });
   }
 
-  private focus() {
+  focus() {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
         this.focusManager.start(this.el.shadowRoot || this.el);
@@ -72,11 +85,8 @@ export class ModalController<R = any> implements ModalControllerConfig {
   }
 }
 
-export function WithModal<R>(
-  Base: CustomElementConstructor,
-  config: Partial<ModalControllerConfig> = {}
-) {
-  return class extends Base implements Modal {
+export function WithModal<R>(Base: CustomElementConstructor, config: Partial<ModalConfig> = {}) {
+  return class ModalElement extends Base implements Modal {
     controller = new ModalController<R>(this, config);
   };
 }

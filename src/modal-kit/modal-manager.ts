@@ -1,6 +1,5 @@
 import { Modal, ModalController } from './modal-controller';
 
-import { ScrollManager } from '../utils/scroll-manager';
 import { animate } from '../utils/animate';
 
 export interface ModalManagerOptions {
@@ -14,7 +13,6 @@ export type ModalFactory<T> = () => T;
 
 export class ModalManager {
   private controllers = new Set<ModalController>();
-  private scrollManager = new ScrollManager();
   private overlay: HTMLElement | null = null;
 
   private onKeyUp = (e: KeyboardEvent) => {
@@ -43,11 +41,6 @@ export class ModalManager {
 
     this.controllers.add(modal.controller);
     this.root.appendChild(modal);
-
-    // Freeze any background scrolling
-    if (this.opts.freezeScroll) {
-      this.scrollManager.freezeScroll();
-    }
 
     // Handle adding a single overlay
     if (this.opts.showOverlay && !this.overlay) {
@@ -104,7 +97,6 @@ export class ModalManager {
   }
 
   private onClose(modal: ModalElement) {
-    this.scrollManager.releaseScroll();
     this.controllers.delete(modal.controller);
     this.root.removeChild(modal);
 

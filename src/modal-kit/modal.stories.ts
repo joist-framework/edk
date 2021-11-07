@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
-import { DialogElement } from './examples/dialog';
+import { MyDialog } from './examples/dialog';
 import { ToastElement } from './examples/toast';
 import { ModalManager } from './modal-manager';
 
@@ -9,7 +9,7 @@ export default {
   title: 'modal',
 } as Meta;
 
-customElements.define('my-dialog', DialogElement);
+customElements.define('my-dialog', MyDialog);
 customElements.define('app-toast', ToastElement);
 
 export const Dialog = () => {
@@ -17,7 +17,7 @@ export const Dialog = () => {
   const modal = new ModalManager(modalRoot, { showOverlay: true, freezeScroll: true });
 
   async function openModal() {
-    const { controller } = modal.open(DialogElement, { fname: 'Danny' });
+    const { controller } = modal.open(MyDialog, { fname: 'Danny' });
     const res = await controller.result;
 
     console.log('####', res ? Array.from(res.values()) : res);
