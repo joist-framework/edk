@@ -1,9 +1,7 @@
 import { render, html } from 'lit-html';
 import { WithModal } from '../modal-controller';
 
-const Toast = WithModal({ closeOnEsc: true, captureFocus: true });
-
-export class ToastElement extends Toast(HTMLElement) {
+export class ToastElement extends WithModal(HTMLElement) {
   connectedCallback() {
     this.render();
   }

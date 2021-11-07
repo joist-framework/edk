@@ -17,10 +17,10 @@ export const Dialog = () => {
   const modal = new ModalManager(modalRoot, { showOverlay: true, freezeScroll: true });
 
   async function openModal() {
-    const el = modal.open(DialogElement, { fname: 'Danny' });
-    const res = await el.controller.result;
+    const { controller } = modal.open(DialogElement, { fname: 'Danny' });
+    const res = await controller.result;
 
-    console.log('####', res ? res.values() : res);
+    console.log('####', res ? Array.from(res.values()) : res);
   }
 
   return html`

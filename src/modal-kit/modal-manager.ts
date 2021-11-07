@@ -5,7 +5,6 @@ import { animate } from '../utils/animate';
 
 export interface ModalManagerOptions {
   showOverlay?: boolean;
-  document?: Document | ShadowRoot;
   freezeScroll?: boolean;
 }
 
@@ -17,8 +16,6 @@ export class ModalManager {
   private controllers = new Set<ModalController>();
   private scrollManager = new ScrollManager();
   private overlay: HTMLElement | null = null;
-  private previouslyActive: HTMLElement | null = null;
-  private document: Document | ShadowRoot;
 
   private onKeyUp = (e: KeyboardEvent) => {
     if (e.key.toUpperCase() === 'ESCAPE') {
@@ -34,8 +31,6 @@ export class ModalManager {
 
   constructor(private root: HTMLElement, private opts: ModalManagerOptions = {}) {
     document.addEventListener('keyup', this.onKeyUp);
-
-    this.document = this.opts.document || document;
   }
 
   open<T extends ModalElement>(
@@ -48,8 +43,6 @@ export class ModalManager {
 
     this.controllers.add(modal.controller);
     this.root.appendChild(modal);
-
-    this.previouslyActive = this.document.activeElement as HTMLElement;
 
     // Freeze any background scrolling
     if (this.opts.freezeScroll) {
@@ -100,24 +93,23 @@ export class ModalManager {
     animate(this.overlay, 'modal-overlay-enter');
   }
 
+  clearOverlay() {
+    if (this.overlay) {
+      animate(this.overlay, 'modal-overlay-exit').then(() => {
+        this.root.removeChild(this.overlay!);
+
+        this.overlay = null;
+      });
+    }
+  }
+
   private onClose(modal: ModalElement) {
     this.scrollManager.releaseScroll();
     this.controllers.delete(modal.controller);
     this.root.removeChild(modal);
 
     if (this.controllers.size === 0) {
-      if (this.overlay) {
-        animate(this.overlay, 'modal-overlay-exit').then(() => {
-          this.root.removeChild(this.overlay!);
-
-          this.overlay = null;
-        });
-      }
-
-      if (this.previouslyActive) {
-        this.previouslyActive.focus();
-        this.previouslyActive = null;
-      }
+      this.clearOverlay();
     }
   }
 }

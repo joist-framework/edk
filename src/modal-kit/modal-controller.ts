@@ -15,6 +15,7 @@ export interface ModalControllerConfig {
 export class ModalController<R = any> implements ModalControllerConfig {
   private resolve: (value?: R) => void = () => void 0;
   private focusManager = new FocusManager();
+  private previouslyActive: HTMLElement | null = null;
 
   public closeOnEsc = false;
   public captureFocus = false;
@@ -26,6 +27,7 @@ export class ModalController<R = any> implements ModalControllerConfig {
   constructor(private el: HTMLElement, config: Partial<ModalControllerConfig> = {}) {
     this.closeOnEsc = config.closeOnEsc || false;
     this.captureFocus = config.captureFocus || false;
+    this.previouslyActive = document.activeElement as HTMLElement;
   }
 
   open(): void {
@@ -42,6 +44,10 @@ export class ModalController<R = any> implements ModalControllerConfig {
 
   async close(value?: R) {
     this.resolve(value);
+
+    if (this.previouslyActive) {
+      this.previouslyActive.focus();
+    }
 
     return animate(this.el, 'modal-exit').then(() => {
       this.el.dispatchEvent(new ModalEvent('modalclose', { bubbles: true }));
@@ -66,10 +72,11 @@ export class ModalController<R = any> implements ModalControllerConfig {
   }
 }
 
-export function WithModal<R = any>(config: Partial<ModalControllerConfig> = {}) {
-  return <T extends new (...args: any[]) => HTMLElement>(Base: T) => {
-    return class extends Base implements Modal {
-      controller = new ModalController<R>(this, config);
-    };
+export function WithModal<R>(
+  Base: CustomElementConstructor,
+  config: Partial<ModalControllerConfig> = {}
+) {
+  return class extends Base implements Modal {
+    controller = new ModalController<R>(this, config);
   };
 }

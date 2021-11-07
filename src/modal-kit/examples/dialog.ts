@@ -2,9 +2,10 @@ import { html, render } from 'lit-html';
 
 import { WithModal } from '../modal-controller';
 
-const Dialog = WithModal<FormData>({ closeOnEsc: true, captureFocus: true });
-
-export class DialogElement extends Dialog(HTMLElement) {
+export class DialogElement extends WithModal<FormData>(HTMLElement, {
+  closeOnEsc: true,
+  captureFocus: true,
+}) {
   fname: string = '';
   lname: string = '';
 

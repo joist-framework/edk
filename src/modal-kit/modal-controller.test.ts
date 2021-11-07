@@ -2,8 +2,8 @@ import { expect } from '@open-wc/testing';
 
 import { WithModal } from './modal-controller';
 
-const Modal = WithModal<string>({})(HTMLElement);
-customElements.define('modal-controller-test', WithModal({})(HTMLElement));
+const Modal = WithModal<string>(HTMLElement);
+customElements.define('modal-controller-test', Modal);
 
 describe('ModalController', () => {
   it('should resolve the result to the value passed when closing', async () => {

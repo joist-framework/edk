@@ -1,9 +1,9 @@
 import { expect } from '@open-wc/testing';
 
-import { ModalController } from './modal-controller';
+import { WithModal } from './modal-controller';
 import { ModalManager } from './modal-manager';
 
-class ModalManagerTest extends ModalController {
+class ModalManagerTest extends WithModal(HTMLElement) {
   foo: string = '';
   bar: string = '';
 }
@@ -63,16 +63,16 @@ describe('ModalController', () => {
     const container = document.createElement('div');
     const manager = new ModalManager(container, { showOverlay: true });
 
-    const controller1 = manager.open(ModalManagerTest, { foo: 'Hello', bar: 'World' });
-    const controller2 = manager.open(ModalManagerTest, { foo: 'Hello', bar: 'World' });
+    const el1 = manager.open(ModalManagerTest, { foo: 'Hello', bar: 'World' });
+    const el2 = manager.open(ModalManagerTest, { foo: 'Hello', bar: 'World' });
 
     expect(container.querySelectorAll('.modal-overlay').length).to.equal(1);
 
-    await controller1.close();
+    await el1.controller.close();
 
     expect(container.querySelectorAll('.modal-overlay').length).to.equal(1);
 
-    await controller2.close();
+    await el2.controller.close();
 
     expect(container.querySelectorAll('.modal-overlay').length).to.equal(0);
   });
