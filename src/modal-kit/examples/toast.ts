@@ -1,7 +1,9 @@
 import { render, html } from 'lit-html';
-import { ModalController } from '../modal-controller';
+import { WithModal } from '../modal-controller';
 
-export class ToastElement extends ModalController<FormData> {
+const Toast = WithModal({ closeOnEsc: true, captureFocus: true });
+
+export class ToastElement extends Toast(HTMLElement) {
   connectedCallback() {
     this.render();
   }
@@ -11,6 +13,7 @@ export class ToastElement extends ModalController<FormData> {
   }
 
   private template() {
-    return html`Thiis is a toast message! <button @click=${() => this.close()}>X</button>`;
+    return html`Thiis is a toast message!
+      <button @click=${() => this.controller.close()}>X</button>`;
   }
 }

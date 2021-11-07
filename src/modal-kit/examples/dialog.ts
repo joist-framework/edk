@@ -1,12 +1,12 @@
 import { html, render } from 'lit-html';
 
-import { ModalController } from '../modal-controller';
+import { WithModal } from '../modal-controller';
 
-export class MyDialog extends ModalController<FormData> {
+const Dialog = WithModal({ closeOnEsc: true, captureFocus: true });
+
+export class DialogElement extends Dialog(HTMLElement) {
   fname: string = '';
   lname: string = '';
-  closeOnEsc = true;
-  captureFocus = true;
 
   constructor() {
     super();
@@ -21,7 +21,7 @@ export class MyDialog extends ModalController<FormData> {
   private onClose(e: Event) {
     e.preventDefault();
 
-    this.close(new FormData(e.target as HTMLFormElement));
+    this.controller.close(new FormData(e.target as HTMLFormElement));
   }
 
   private render() {

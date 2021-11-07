@@ -1,4 +1,4 @@
-import { ModalController } from './modal-controller';
+import { Modal, ModalController } from './modal-controller';
 
 import { FocusManager } from '../utils/focus-manager';
 import { ScrollManager } from '../utils/scroll-manager';
@@ -10,9 +10,12 @@ export interface ModalManagerOptions {
   freezeScroll?: boolean;
 }
 
-export class ModalManager {
-  public controllers = new Set<ModalController>();
+export type ModalElement = Modal & HTMLElement;
+export type ModalConstructor<T> = new (...args: any[]) => T;
+export type ModalFactory<T> = () => T;
 
+export class ModalManager {
+  private controllers = new Set<ModalController>();
   private focusManager = new FocusManager();
   private scrollManager = new ScrollManager();
   private overlay: HTMLElement | null = null;
@@ -37,15 +40,16 @@ export class ModalManager {
     this.document = this.opts.document || document;
   }
 
-  open<T extends ModalController>(
-    Modal: (new (...args: any[]) => T) | (() => T),
+  open<T extends ModalElement>(
+    El: ModalConstructor<T> | ModalFactory<T>,
     props: Partial<T> = {}
   ): T {
-    const controller = this.createController(Modal, props);
+    const modal = this.createModal(El, props);
 
-    this.controllers.add(controller);
+    modal.controller.open();
 
-    controller.open(this.root);
+    this.controllers.add(modal.controller);
+    this.root.appendChild(modal);
 
     this.previouslyActive = this.document.activeElement as HTMLElement;
 
@@ -56,36 +60,31 @@ export class ModalManager {
 
     // Handle adding a single overlay
     if (this.opts.showOverlay && !this.overlay) {
-      this.overlay = document.createElement('div');
-      this.overlay.classList.add('modal-overlay');
-
-      this.root.prepend(this.overlay);
-
-      animate(this.overlay, 'modal-overlay-enter');
+      this.applyOverlay();
     }
 
     // stop any previous focus manager
     this.focusManager.stop();
 
-    if (controller.captureFocus) {
+    if (modal.controller.captureFocus) {
       // Add code to be run in the next event loop. This is required in case content is added after the modal is created
       setTimeout(() => {
-        this.focusOn(controller);
+        this.focusOn(modal);
       }, 0);
     }
 
-    controller.result.then(() => {
-      this.onClose(controller);
+    modal.controller.result.then(() => {
+      this.onClose(modal);
     });
 
-    return controller;
+    return modal;
   }
 
   clean() {
     document.removeEventListener('keyup', this.onKeyUp);
   }
 
-  focusOn(controller: ModalController) {
+  focusOn(controller: Modal & HTMLElement) {
     this.focusManager.start(controller.shadowRoot || controller);
 
     // focus of first focusable element
@@ -94,16 +93,16 @@ export class ModalManager {
     }
   }
 
-  createController<T extends ModalController>(
-    Modal: (new (...args: any[]) => T) | (() => T),
+  createModal<T extends ModalElement>(
+    El: ModalConstructor<T> | ModalFactory<T>,
     props: Partial<T> = {}
   ): T {
     let controller: T;
 
     try {
-      controller = new (Modal as new (...args: any[]) => T)();
+      controller = new (El as ModalConstructor<T>)();
     } catch {
-      controller = (Modal as () => T)();
+      controller = (El as ModalFactory<T>)();
     }
 
     for (let prop in props) {
@@ -113,9 +112,19 @@ export class ModalManager {
     return controller;
   }
 
-  private onClose(controller: ModalController) {
+  applyOverlay() {
+    this.overlay = document.createElement('div');
+    this.overlay.classList.add('modal-overlay');
+
+    this.root.prepend(this.overlay);
+
+    animate(this.overlay, 'modal-overlay-enter');
+  }
+
+  private onClose(modal: ModalElement) {
     this.scrollManager.releaseScroll();
-    this.controllers.delete(controller);
+    this.controllers.delete(modal.controller);
+    this.root.removeChild(modal);
 
     if (this.controllers.size === 0) {
       if (this.overlay) {
