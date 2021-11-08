@@ -48,7 +48,15 @@ export class ModalManager {
     }
 
     modal.controller.result.then(() => {
-      this.onClose(modal);
+      this.controllers.delete(modal.controller);
+
+      if (this.controllers.size === 0) {
+        this.clearOverlay();
+      }
+    });
+
+    modal.addEventListener('modalclose', () => {
+      this.root.removeChild(modal);
     });
 
     return modal;
@@ -93,15 +101,6 @@ export class ModalManager {
 
         this.overlay = null;
       });
-    }
-  }
-
-  private onClose(modal: ModalElement) {
-    this.controllers.delete(modal.controller);
-    this.root.removeChild(modal);
-
-    if (this.controllers.size === 0) {
-      this.clearOverlay();
     }
   }
 }

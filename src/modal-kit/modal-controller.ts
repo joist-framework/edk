@@ -55,6 +55,7 @@ export class ModalController<R = any> implements ModalConfig {
 
   async close(value?: R) {
     this.resolve(value);
+    this.scrollManager.releaseScroll();
 
     if (this.previouslyActive) {
       this.previouslyActive.focus();
@@ -62,8 +63,6 @@ export class ModalController<R = any> implements ModalConfig {
 
     return animate(this.el, 'modal-exit').then(() => {
       this.el.dispatchEvent(new ModalEvent('modalclose', { bubbles: true }));
-
-      this.scrollManager.releaseScroll();
 
       return this;
     });
