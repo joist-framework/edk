@@ -6,4 +6,4 @@
 *.d.ts
 *.js
 *.js.map
-!docs/**/*.js
+.DS_Store
