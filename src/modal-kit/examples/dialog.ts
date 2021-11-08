@@ -1,12 +1,14 @@
 import { html, css, LitElement } from 'lit';
 
-import { WithModal } from '../modal-controller';
+import { ModalConfig, WithModal } from '../modal-controller';
 
-function DialogElement<T>() {
-  return WithModal<T>(LitElement, { closeOnEsc: true, captureFocus: true, freezeScroll: true });
-}
+const MODAL_CONFIG: ModalConfig = {
+  closeOnEsc: true,
+  captureFocus: true,
+  freezeScroll: true,
+};
 
-export class MyDialog extends DialogElement<FormData>() {
+export class MyDialog extends WithModal<FormData>(LitElement, MODAL_CONFIG) {
   static get styles() {
     return css`
       :host {

@@ -14,7 +14,7 @@ customElements.define('app-toast', ToastElement);
 
 export const Dialog = () => {
   const modalRoot = document.createElement('div');
-  const modal = new ModalManager(modalRoot, { showOverlay: true, freezeScroll: true });
+  const modal = new ModalManager(modalRoot, { showOverlay: true });
 
   async function openModal() {
     const { controller } = modal.open(MyDialog, { fname: 'Danny' });

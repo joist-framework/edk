@@ -28,7 +28,15 @@ export class ModalController<R = any> implements ModalConfig {
     this.resolve = resolve;
   });
 
+  private onKeyUp = (e: KeyboardEvent) => {
+    if (e.key.toUpperCase() === 'ESCAPE' && this.closeOnEsc) {
+      this.close();
+    }
+  };
+
   constructor(private el: HTMLElement, config: Partial<ModalConfig> = {}) {
+    document.addEventListener('keyup', this.onKeyUp);
+
     this.closeOnEsc = config.closeOnEsc || false;
     this.captureFocus = config.captureFocus || false;
     this.freezeScroll = config.freezeScroll || false;
@@ -56,6 +64,8 @@ export class ModalController<R = any> implements ModalConfig {
   async close(value?: R) {
     this.resolve(value);
     this.scrollManager.releaseScroll();
+
+    document.removeEventListener('keyup', this.onKeyUp);
 
     if (this.previouslyActive) {
       this.previouslyActive.focus();

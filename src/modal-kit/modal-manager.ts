@@ -4,7 +4,6 @@ import { animate } from '../utils/animate';
 
 export interface ModalManagerOptions {
   showOverlay?: boolean;
-  freezeScroll?: boolean;
 }
 
 export type ModalElement = Modal & HTMLElement;
@@ -15,21 +14,7 @@ export class ModalManager {
   private controllers = new Set<ModalController>();
   private overlay: HTMLElement | null = null;
 
-  private onKeyUp = (e: KeyboardEvent) => {
-    if (e.key.toUpperCase() === 'ESCAPE') {
-      const modal = this.controllers.values().next();
-
-      if (!modal.done) {
-        if (modal.value.closeOnEsc) {
-          modal.value.close();
-        }
-      }
-    }
-  };
-
-  constructor(private root: HTMLElement, private opts: ModalManagerOptions = {}) {
-    document.addEventListener('keyup', this.onKeyUp);
-  }
+  constructor(private root: HTMLElement, private opts: ModalManagerOptions = {}) {}
 
   open<T extends ModalElement>(
     El: ModalConstructor<T> | ModalFactory<T>,
@@ -60,10 +45,6 @@ export class ModalManager {
     });
 
     return modal;
-  }
-
-  clean() {
-    document.removeEventListener('keyup', this.onKeyUp);
   }
 
   createModal<T extends ModalElement>(
