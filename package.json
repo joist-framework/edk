@@ -26,7 +26,7 @@
   "license": "ISC",
   "dependencies": {
     "@joist/component": "1.8.8",
-    "@joist/di": "1.8.8",
+    "@joist/di": "1.8.10",
     "lit-html": "2.0.2"
   },
   "devDependencies": {
