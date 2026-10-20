@@ -27,7 +27,7 @@
   "dependencies": {
     "@joist/component": "1.8.8",
     "@joist/di": "1.8.8",
-    "lit-html": "2.0.2"
+    "lit-html": "2.8.0"
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
